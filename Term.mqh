@@ -49,18 +49,11 @@ private:
    bool              SearchVariable(string variableName);
    bool              SearchArrayName(string arrayName);
 
-public:
-                     Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
-                     Term(string _name);
-
    bool              SearchTermName(string termName, string &array[],TermType _type);
    bool              IsVariable();
    bool              IsArray();
    bool              HasError();
-   double            GetValue();
    double            CalculateExpressions();
-
-   string            GetValueString();
 
    TermType          GetType() {return(type);};
    int               GetIndex() {return(index);};
@@ -69,6 +62,15 @@ public:
    bool              IsNumericValue(string value);
    int               GetNumericValue(string value);
    void              SearchValue(string valueName,double &value);
+
+
+public:
+                     Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
+                     Term(string _name);
+   double            GetValue();
+   string            GetValueString();
+
+
   };
 
 
