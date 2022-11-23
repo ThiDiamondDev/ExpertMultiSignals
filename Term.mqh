@@ -56,8 +56,6 @@ private:
    bool              HasError();
    double            CalculateExpressions();
 
-   TermType          GetType() {return(type);};
-   int               GetIndex() {return(index);};
    int               GetArrayIndex() {return(arrayIndex);};
    string            GetName() {return(name);};
    string            GetError() {return(error);};
@@ -71,7 +69,9 @@ public:
                      Term(string _name);
    double            GetValue();
    string            GetValueString();
-
+   TermType          GetType() {return(type);};
+   int               GetIndex() {return(index);};
+   
 
   };
 

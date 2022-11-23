@@ -10,6 +10,7 @@
 #include "Expression.mqh"
 #include <Object.mqh>
 #include <Arrays\ArrayObj.mqh>
+#include <Arrays\ArrayInt.mqh>
 
 const string RELATIONAL_OPERATORS_STRING[] = {"==","!=",">","<",">=","<="};
 string RELATIONAL_OPERATORS_TOKENS[] = {"=","!",">","<","@","#",};
@@ -28,9 +29,10 @@ class ExpressionParser
 private:
    string            expression_str;
    CArrayObj         expressions;
+   CArrayInt         *termIndexArray;
    ushort            relationalCodeArray[], logicalCodeArray[];
 
-
+   void              FillTermIndexArray(void);
    string            GetExpressionStr(void) {return(expression_str);}
    void              SplitExpressions(void);
    void              GetValidOperatorsCodeArray(ushort& array[],string &operators[]);
@@ -41,10 +43,16 @@ private:
 
 public:
                      ExpressionParser(string _expression);
+                     ~ExpressionParser(){
+                     delete termIndexArray;
+                     };
+   
    void              ResolveAllExpressions(void);
    void              PrintAllSolvedExpressions();
    string            GetAllSolvedExpressions();
-
+   void              GetTermIndexArray();
+   void              TermIndexArray(CArrayInt *array);
+   
   };
 
 //+------------------------------------------------------------------+
@@ -58,6 +66,7 @@ ExpressionParser::ExpressionParser(string _expression)
    GetValidOperatorsCodeArray(logicalCodeArray,LOGICAL_OPERATORS_STRING);
 
    SplitExpressions();
+   FillTermIndexArray();
   }
 
 //+------------------------------------------------------------------+
@@ -80,7 +89,33 @@ void ExpressionParser::SplitExpressions()
                new  Expression(result[0], result[1], RELATIONAL_OPERATORS_STRING[opIdx],opIdx));
         }
   }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void  ExpressionParser::FillTermIndexArray()
+  {
+   for(int i=0; i<expressions.Total(); i++)
+     {
+      Expression *expression= expressions.At(i);
+      if(!expression.HasError())
+        {
+         TermType typeA = expression.GetTermAType();
+         TermType typeB = expression.GetTermBType();
+         int      indexA = expression.GetTermAIndex();
+         int      indexB = expression.GetTermBIndex();
 
+         if(typeA == TERM_ARRAY && termIndexArray.Search(indexA) == -1)
+            termIndexArray.Add(indexA);
+         if(typeB == TERM_ARRAY && termIndexArray.Search(indexB) == -1)
+            termIndexArray.Add(indexB);
+
+        }
+     }
+  }
+
+   void ExpressionParser::TermIndexArray(CArrayInt *array){
+     array.AssignArray(termIndexArray);
+   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -159,7 +194,7 @@ string ExpressionParser::GetAllSolvedExpressions(void)
       Expression *expression= expressions.At(i);
       if(i > 0)
          solution += " & ";
-      
+
       solution += expression.GetSolvedString();
      }
    return(solution);

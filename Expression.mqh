@@ -41,12 +41,15 @@ public:
                      Expression() {};
    bool              Resolve();
    bool              HasError();
+   TermType          GetTermAType();
+   TermType          GetTermBType();
+   int               GetTermAIndex(void);
+   int               GetTermBIndex(void);
+
    string            GetSolvedString();
                       Expression(string a,string b, string _operator, int _operatorIndex):
                      termA(a), termB(b), operatorValue(_operator),
                      operatorIndex(_operatorIndex), error(""),expressionStr(a+_operator+b) {}
-
-
   };
 
 //+------------------------------------------------------------------+
@@ -96,6 +99,26 @@ void Expression::SetError(string errorMessage)
    error = errorMessage;
   }
 
+
+TermType Expression::GetTermAType(void)
+  {
+   return(termA.GetType());
+  }
+  
+TermType Expression::GetTermBType(void)
+  {
+   return(termB.GetType());
+  }
+  
+int Expression::GetTermAIndex(void)
+  {
+   return(termA.GetIndex());
+  }
+  
+int Expression::GetTermBIndex(void)
+  {
+   return(termB.GetIndex());
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
