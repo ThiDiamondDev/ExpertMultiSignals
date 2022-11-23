@@ -14,7 +14,9 @@
 void OnStart()
   {
 //---
-   ExpressionParser parser("15 > 25 & 10 == 11"); 
+   string expression = "array1[1] > array2[5] & 50 > 40";
+   ExpressionParser parser(expression);
+   
    string solution = parser.GetAllSolvedExpressions();
    parser.PrintAllSolvedExpressions();
   }
