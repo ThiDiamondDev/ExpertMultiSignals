@@ -8,8 +8,7 @@
 #property version   "1.00"
 
 #include "Variable.mqh";
-
-string            VALID_ARRAYS[]    = {"ma1","ma2","ma3","ma4"};
+#include "Array.mqh";
 
 enum TermType
   {
@@ -39,36 +38,41 @@ private:
    string            error;
    int               index;
    TermType          type;
+   int               arrayIndex;
 
    void              SetError(string _error) {error = _error;}
    void              SetType(TermType _type) {type = _type;}
    void              SetIndex(int _index) {index = _index;}
+   void              SetArrayIndex(int _index) {arrayIndex = _index;}
 
    double            GetVariableValue();
    double            GetArrayValue();
    bool              SearchVariable(string variableName);
    bool              SearchArrayName(string arrayName);
 
-public:
-                     Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
-                     Term(string _name);
-
    bool              SearchTermName(string termName, string &array[],TermType _type);
    bool              IsVariable();
    bool              IsArray();
    bool              HasError();
-   double            GetValue();
    double            CalculateExpressions();
-
-   string            GetValueString();
 
    TermType          GetType() {return(type);};
    int               GetIndex() {return(index);};
+   int               GetArrayIndex() {return(arrayIndex);};
    string            GetName() {return(name);};
    string            GetError() {return(error);};
    bool              IsNumericValue(string value);
    int               GetNumericValue(string value);
    void              SearchValue(string valueName,double &value);
+
+
+public:
+                     Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
+                     Term(string _name);
+   double            GetValue();
+   string            GetValueString();
+
+
   };
 
 
@@ -104,7 +108,26 @@ bool Term::SearchVariable(string variableName)
 //+------------------------------------------------------------------+
 bool Term::SearchArrayName(string arrayName)
   {
-   return(SearchTermName(arrayName,VALID_ARRAYS, TERM_ARRAY));
+   bool isValidTerm = false;
+   string splitted[], indexValue;
+   int bracketsCloseIndex;
+   StringSplit(arrayName,'[',splitted);
+   if(ArraySize(splitted) == 2)
+     {
+      indexValue = splitted[1];
+      bracketsCloseIndex = StringLen(indexValue) - 1;
+      if(StringGetCharacter(indexValue,bracketsCloseIndex) == ']')
+        {
+         indexValue = StringSubstr(indexValue,0,bracketsCloseIndex);
+         isValidTerm = SearchTermName(splitted[0],VALID_ARRAYS, TERM_ARRAY);
+         if(IsNumericValue(indexValue) && isValidTerm)
+           {
+            SetArrayIndex(GetNumericValue(indexValue));
+            return(true);
+           }
+        }
+     }
+   return(false);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -142,8 +165,8 @@ void Term::SearchValue(string valueName,double &value)
          value = VARIABLE_VALUES[varIndex];
       else
         {
-         int arrayIndex = ArrayContains(valueName,VALID_ARRAYS);
-         if(arrayIndex >= 0)
+         int _arrayIndex = ArrayContains(valueName,VALID_ARRAYS);
+         if(_arrayIndex >= 0)
             value = GetArrayValue();
 
         }
@@ -177,10 +200,6 @@ int Term::GetNumericValue(string value)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
 bool Term::SearchTermName(string termName, string &array[],TermType _type)
   {
    int _index = ArrayContains(termName,array);
@@ -198,7 +217,7 @@ bool Term::SearchTermName(string termName, string &array[],TermType _type)
 //+------------------------------------------------------------------+
 bool Term::IsArray(void)
   {
-   return(GetType() == TERM_ARRAY && GetIndex() >= 0);
+   return(GetType() == TERM_ARRAY && GetIndex() >= 0 && GetArrayIndex() >= 0);
   }
 
 //+------------------------------------------------------------------+
@@ -256,7 +275,7 @@ double Term::GetVariableValue(void)
 //+------------------------------------------------------------------+
 double Term::GetArrayValue(void)
   {
-   return(-1);
+   return(CallArrayValue(GetIndex(), GetArrayIndex()));
   }
 
 
