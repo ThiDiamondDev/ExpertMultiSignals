@@ -7,15 +7,59 @@
 #property link      "https://github.com/ThiDiamondDev"
 #property version   "1.00"
 
+#include "MACaller.mqh"
 
 
-string  VALID_ARRAYS[] = {"array1", "array2", "array3", "array4"};
+string  VALID_ARRAYS[] = {"ma1", "ma2", "ma3", "ma4"};
 
-enum ARRAYS
+enum INDICATORS
   {
-   ARRAY1,ARRAY2,ARRAY3,ARRAY4
+   MA1,MA2,MA3,MA4
   };
 
+
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+class Caller
+  {
+private:
+   MACaller          *maCaller;
+public:
+                     Caller(string _symbolName, ENUM_TIMEFRAMES _timeframe, CIndicators *_indicators);
+                    ~Caller(void);
+   bool              InitIndicator(int index);
+   double            CallIndicator(int indicator,int callIndex);
+  };
+
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+Caller::Caller(string _symbolName, ENUM_TIMEFRAMES _timeframe, CIndicators *_indicators)
+  {
+   maCaller = new MACaller(_symbolName,_timeframe,_indicators);
+  };
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool    Caller::InitIndicator(int indicator)
+  {
+   switch(indicator)
+     {
+      case  MA1:
+         return(maCaller.InitMA1());
+      case  MA2:
+         return(maCaller.InitMA2());
+      case  MA3:
+         return(maCaller.InitMA3());
+      case  MA4:
+         return(maCaller.InitMA4());
+     }
+   return(false);
+  }
 
 
 //+------------------------------------------------------------------+
@@ -30,69 +74,20 @@ bool IsValidIndex(int index, int arraySize)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-double CallArrayValue(int nameIndex,int callIndex)
+double Caller::CallIndicator(int indicator,int callIndex)
   {
-   switch(nameIndex)
+   switch(indicator)
      {
-      case  ARRAY1:
-         return(GetArray1(callIndex));
-      case  ARRAY2:
-         return(GetArray2(callIndex));
-      case  ARRAY3:
-         return(GetArray3(callIndex));
-      case  ARRAY4:
-         return(GetArray4(callIndex));
+      case  MA1:
+         return(maCaller.GetMA1(callIndex));
+      case  MA2:
+         return(maCaller.GetMA2(callIndex));
+      case  MA3:
+         return(maCaller.GetMA3(callIndex));
+      case  MA4:
+         return(maCaller.GetMA4(callIndex));
 
-      default:
-         break;
      }
    return(0);
   }
-
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double GetArray1(int index)
-  {
-   double array[] = {0,1,2,3,4,5};
-   if(IsValidIndex(index,ArraySize(array)))
-      return(array[index]);
-   return(0);
-  }
-
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double GetArray2(int index)
-  {
-   double array[] = {0,2,4,6,8,10};
-   if(IsValidIndex(index,ArraySize(array)))
-      return(array[index]);
-   return(0);
-  }
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double GetArray3(int index)
-  {
-   double array[] = {0,3,5,7,9,12};
-   if(IsValidIndex(index,ArraySize(array)))
-      return(array[index]);
-   return(0);
-  }
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double GetArray4(int index)
-  {
-   double array[] = {1,1,1,1,1,1};
-   if(IsValidIndex(index,ArraySize(array)))
-      return(array[index]);
-   return(0);
-  }
-
 //+------------------------------------------------------------------+
