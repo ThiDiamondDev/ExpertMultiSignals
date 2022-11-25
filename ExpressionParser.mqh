@@ -8,6 +8,7 @@
    Operations: /, %, *, +, -, >, <, >=, <=, ==, !=, &&, ||
 */
 #include "Expression.mqh"
+#include "Indicators\Caller.mqh";
 #include <Object.mqh>
 #include <Arrays\ArrayObj.mqh>
 #include <Arrays\ArrayInt.mqh>
@@ -31,6 +32,7 @@ private:
    CArrayObj         expressions;
    CArrayInt         *termIndexArray;
    ushort            relationalCodeArray[], logicalCodeArray[];
+   Caller            *caller;
 
    void              FillTermIndexArray(void);
    string            GetExpressionStr(void) {return(expression_str);}
@@ -42,33 +44,37 @@ private:
    bool              ResolveLogicalExpression(bool expression1, bool expression2,bool isAndCondition);
 
 public:
-                     ExpressionParser(string _expression);
-                     ~ExpressionParser(){
-                     delete termIndexArray;
-                     };
-   
+                     ExpressionParser(string _expression, string _symbolName,
+                    ENUM_TIMEFRAMES _timeframe,CIndicators *_indicators);
+                    ~ExpressionParser();
+
    void              ResolveAllExpressions(void);
    void              PrintAllSolvedExpressions();
    string            GetAllSolvedExpressions();
-   void              GetTermIndexArray();
-   void              TermIndexArray(CArrayInt *array);
-   
+   bool              InitIndicators();
+
   };
 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-ExpressionParser::ExpressionParser(string _expression)
+ExpressionParser::ExpressionParser(string _expression, string _symbolName, ENUM_TIMEFRAMES _timeframe,
+                                   CIndicators *_indicators)
    : expression_str(_expression)
   {
    StringReplace(expression_str, " ", "");
    GetValidOperatorsCodeArray(relationalCodeArray,RELATIONAL_OPERATORS_TOKENS);
    GetValidOperatorsCodeArray(logicalCodeArray,LOGICAL_OPERATORS_STRING);
-
+   caller = new Caller(_symbolName,_timeframe,_indicators);
    SplitExpressions();
    FillTermIndexArray();
+   
   }
 
+ExpressionParser::~ExpressionParser(){
+   delete termIndexArray;
+   delete caller;
+ }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -86,7 +92,7 @@ void ExpressionParser::SplitExpressions()
          string result[];
          if(StringSplit(_expressions[expIdx],relationalCodeArray[opIdx],result) == 2)
             expressions.Add(
-               new  Expression(result[0], result[1], RELATIONAL_OPERATORS_STRING[opIdx],opIdx));
+               new  Expression(result[0], result[1], RELATIONAL_OPERATORS_STRING[opIdx],opIdx,caller));
         }
   }
 //+------------------------------------------------------------------+
@@ -113,17 +119,16 @@ void  ExpressionParser::FillTermIndexArray()
      }
   }
 
-   void ExpressionParser::TermIndexArray(CArrayInt *array){
-     array.AssignArray(termIndexArray);
-   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool ExpressionParser::ResolveLogicalExpression(bool value1, bool value2, bool isAndCondition)
+bool ExpressionParser::InitIndicators()
   {
-   if(isAndCondition)
-      return(value1 && value2);
-   return(value1 && value2);
+   for(int index=0;index<termIndexArray.Total();index++)
+     if(!caller.InitIndicator(termIndexArray.At(index)))
+       return(false);
+   
+   return(true);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |

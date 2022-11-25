@@ -8,7 +8,7 @@
 #property version   "1.00"
 
 #include "Variable.mqh";
-#include "Array.mqh";
+#include "Indicators/Caller.mqh";
 
 enum TermType
   {
@@ -34,6 +34,7 @@ template<typename T> int ArrayContains(T value, const T& array[])
 class Term
   {
 private:
+   Caller            *caller;
    string            name;
    string            error;
    int               index;
@@ -66,7 +67,7 @@ private:
 
 public:
                      Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
-                     Term(string _name);
+                     Term(string _name,Caller *_caller);
    double            GetValue();
    string            GetValueString();
    TermType          GetType() {return(type);};
@@ -79,8 +80,9 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-Term::Term(string _name): name(_name), type(TERM_UNDEFINED), index(-1),error("")
+Term::Term(string _name,Caller *_caller): name(_name), type(TERM_UNDEFINED), index(-1),error("")
   {
+  caller = _caller;
    if(IsNumericValue(GetName()))
       SetType(TERM_NUMERIC);
    else
@@ -275,7 +277,7 @@ double Term::GetVariableValue(void)
 //+------------------------------------------------------------------+
 double Term::GetArrayValue(void)
   {
-   return(CallArrayValue(GetIndex(), GetArrayIndex()));
+   return(caller.CallIndicator(GetIndex(), GetArrayIndex()));
   }
 
 

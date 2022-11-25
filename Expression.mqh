@@ -7,6 +7,7 @@
 #property link      "https://github.com/ThiDiamondDev"
 #property version   "1.00"
 #include  "Term.mqh"
+#include  "Indicators/Caller.mqh"
 #include  <Object.mqh>
 
 
@@ -47,8 +48,8 @@ public:
    int               GetTermBIndex(void);
 
    string            GetSolvedString();
-                      Expression(string a,string b, string _operator, int _operatorIndex):
-                     termA(a), termB(b), operatorValue(_operator),
+                      Expression(string a,string b, string _operator, int _operatorIndex,Caller *caller):
+                     termA(a, caller), termB(b, caller), operatorValue(_operator),
                      operatorIndex(_operatorIndex), error(""),expressionStr(a+_operator+b) {}
   };
 
@@ -81,24 +82,6 @@ bool Expression::Resolve(void)
      }
    return false;
   }
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-string Expression::GetSolvedString(void)
-  {
-   string valueA = termA.GetValueString();
-   string valueB = termB.GetValueString();
-   string solutionOrError = GetSolutionOrError();
-   return(valueA + operatorValue + valueB + "=" + solutionOrError);
-  }
-//+------------------------------------------------------------------+
-
-void Expression::SetError(string errorMessage)
-  {
-   error = errorMessage;
-  }
-
 
 TermType Expression::GetTermAType(void)
   {
