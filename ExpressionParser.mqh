@@ -1,12 +1,9 @@
 //+------------------------------------------------------------------+
-//|                                                      ProjectName |
-//|                                      Copyright 2020, CompanyName |
-//|                                       http://www.companyname.net |
+//|                                             ExpressionParser.mqh |
+//|                                                       ThiDiamond |
+//|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
 
-/*
-   Operations: /, %, *, +, -, >, <, >=, <=, ==, !=, &&, ||
-*/
 #include "Expression.mqh"
 #include "Indicators\Caller.mqh";
 #include <Object.mqh>
@@ -14,12 +11,12 @@
 #include <Arrays\ArrayInt.mqh>
 
 const string RELATIONAL_OPERATORS_STRING[] = {"==","!=",">","<",">=","<="};
-string RELATIONAL_OPERATORS_TOKENS[] = {"=","!",">","<","@","#",};
+const char RELATIONAL_OPERATORS_TOKENS[] = {'=','!','>','<','@','#'};
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 int    TOKENS_SIZE = ArraySize(RELATIONAL_OPERATORS_TOKENS);
-string LOGICAL_OPERATORS_STRING[] = {"&"};
+char LOGICAL_OPERATORS[] = {'&'};
 
 
 //+------------------------------------------------------------------+
@@ -31,21 +28,17 @@ private:
    string            expression_str;
    CArrayObj         expressions;
    CArrayInt         *termIndexArray;
-   ushort            relationalCodeArray[], logicalCodeArray[];
    Caller            *caller;
 
    void              FillTermIndexArray(void);
    string            GetExpressionStr(void) {return(expression_str);}
    void              SplitExpressions(void);
-   void              GetValidOperatorsCodeArray(ushort& array[],string &operators[]);
    void              ReplaceOperatorsWithTokens(string &_expression);
-   void              ReplaceTokensWithOperators(string &_expression);
    int               SplitByOperators(string &expression,ushort &codeArray[], string &result[]);
    bool              ResolveLogicalExpression(bool expression1, bool expression2,bool isAndCondition);
 
 public:
-                     ExpressionParser(string _expression, string _symbolName,
-                    ENUM_TIMEFRAMES _timeframe,CIndicators *_indicators);
+                     ExpressionParser(string _expression, CIndicators *_indicators);
                     ~ExpressionParser();
 
    void              ResolveAllExpressions(void);
@@ -58,23 +51,24 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-ExpressionParser::ExpressionParser(string _expression, string _symbolName, ENUM_TIMEFRAMES _timeframe,
-                                   CIndicators *_indicators)
+ExpressionParser::ExpressionParser(string _expression, CIndicators *_indicators)
    : expression_str(_expression)
   {
    StringReplace(expression_str, " ", "");
-   GetValidOperatorsCodeArray(relationalCodeArray,RELATIONAL_OPERATORS_TOKENS);
-   GetValidOperatorsCodeArray(logicalCodeArray,LOGICAL_OPERATORS_STRING);
-   caller = new Caller(_symbolName,_timeframe,_indicators);
+   caller = new Caller(_indicators);
    SplitExpressions();
    FillTermIndexArray();
-   
+
   }
 
-ExpressionParser::~ExpressionParser(){
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+ExpressionParser::~ExpressionParser()
+  {
    delete termIndexArray;
    delete caller;
- }
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -85,12 +79,12 @@ void ExpressionParser::SplitExpressions()
 
    ReplaceOperatorsWithTokens(expression);
 
-   StringSplit(expression, logicalCodeArray[0],_expressions);
+   StringSplit(expression, LOGICAL_OPERATORS[0],_expressions);
    for(int expIdx = 0; expIdx < ArraySize(_expressions); expIdx++)
-      for(int opIdx=0; opIdx < ArraySize(relationalCodeArray) ; opIdx++)
+      for(int opIdx=0; opIdx < ArraySize(RELATIONAL_OPERATORS_TOKENS) ; opIdx++)
         {
          string result[];
-         if(StringSplit(_expressions[expIdx],relationalCodeArray[opIdx],result) == 2)
+         if(StringSplit(_expressions[expIdx],RELATIONAL_OPERATORS_TOKENS[opIdx],result) == 2)
             expressions.Add(
                new  Expression(result[0], result[1], RELATIONAL_OPERATORS_STRING[opIdx],opIdx,caller));
         }
@@ -124,23 +118,12 @@ void  ExpressionParser::FillTermIndexArray()
 //+------------------------------------------------------------------+
 bool ExpressionParser::InitIndicators()
   {
-   for(int index=0;index<termIndexArray.Total();index++)
-     if(!caller.InitIndicator(termIndexArray.At(index)))
-       return(false);
-   
+   for(int index=0; index<termIndexArray.Total(); index++)
+      if(!caller.InitIndicator(termIndexArray.At(index)))
+         return(false);
+
    return(true);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void ExpressionParser::GetValidOperatorsCodeArray(ushort &dst_array[],string &operators[])
-  {
-   ushort code_list[6];
-   for(int i=0; i<ArraySize(operators); i++)
-      code_list[i] = StringGetCharacter(operators[i],0);
-   ArrayCopy(dst_array, code_list);
-  }
-//+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -148,17 +131,8 @@ void ExpressionParser::GetValidOperatorsCodeArray(ushort &dst_array[],string &op
 void ExpressionParser::ReplaceOperatorsWithTokens(string &_expression)
   {
    for(int i=0; i<TOKENS_SIZE; i++)
-      StringReplace(_expression,RELATIONAL_OPERATORS_STRING[i], RELATIONAL_OPERATORS_TOKENS[i]);
+      StringReplace(_expression,RELATIONAL_OPERATORS_STRING[i],(string) RELATIONAL_OPERATORS_TOKENS[i]);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void ExpressionParser::ReplaceTokensWithOperators(string &_expression)
-  {
-   for(int i=0; i<TOKENS_SIZE; i++)
-      StringReplace(_expression, RELATIONAL_OPERATORS_TOKENS[i],RELATIONAL_OPERATORS_STRING[i]);
-  }
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+

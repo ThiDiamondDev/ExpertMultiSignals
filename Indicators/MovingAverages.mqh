@@ -1,5 +1,5 @@
 //+------------------------------------------------------------------+
-//|                                                MACaller.mqh |
+//|                                               MovingAverages.mqh |
 //|                                                       ThiDiamond |
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
@@ -42,30 +42,22 @@ input ENUM_APPLIED_PRICE   MA4AppliedPrice =  PRICE_CLOSE;   // AppliedPrice
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-class MACaller
+class MovingAverages
   {
 private:
-   string             symbolName;
-   ENUM_TIMEFRAMES    timeframe;
    CiMA              *ma1,*ma2,*ma3,*ma4;
    CIndicators       *indicators;
 
-   bool              InitMA(CIndicators *indicators);
-
 
 public:
-                     MACaller(string _symbolName, ENUM_TIMEFRAMES _timeframe,
-            CIndicators *_indicators):symbolName(_symbolName),timeframe(_timeframe),
+                     MovingAverages(CIndicators *_indicators):
                      indicators(_indicators) {};
 
-                    ~MACaller(void);
-   bool                 InitIndicators();
+                    ~MovingAverages(void);
    bool                 InitMA(CiMA *ma, int period,
                                int shift, ENUM_MA_METHOD method,
                                ENUM_APPLIED_PRICE appliedPrice);
 
-   string               GetSymbolName() {return(symbolName);};
-   ENUM_TIMEFRAMES      GetTimeframe() {return(timeframe);};
 
 public:
    // initialization of the indicators
@@ -85,27 +77,16 @@ public:
 //+------------------------------------------------------------------+
 //| Destructor                                                       |
 //+------------------------------------------------------------------+
-MACaller::~MACaller(void)
+MovingAverages::~MovingAverages(void)
   {
   }
+
 
 
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
 //+------------------------------------------------------------------+
-bool MACaller::InitIndicators()
-  {
-   if(indicators == NULL)
-      return(false);
-   if(!InitMA(ma1,MA1Method,MA1Shift,MA1Method,MA1AppliedPrice))
-      return(false);
-   return(true);
-  }
-
-//+------------------------------------------------------------------+
-//| Create indicators                                                |
-//+------------------------------------------------------------------+
-bool MACaller::InitMA1()
+bool MovingAverages::InitMA1()
   {
    return(InitMA(ma1,MA1Method,MA1Shift,MA1Method,MA1AppliedPrice));
   }
@@ -113,7 +94,7 @@ bool MACaller::InitMA1()
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
 //+------------------------------------------------------------------+
-bool MACaller::InitMA2()
+bool MovingAverages::InitMA2()
   {
    return(InitMA(ma2,MA2Method,MA2Shift,MA2Method,MA2AppliedPrice));
   }
@@ -121,7 +102,7 @@ bool MACaller::InitMA2()
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
 //+------------------------------------------------------------------+
-bool MACaller::InitMA3()
+bool MovingAverages::InitMA3()
   {
    return(InitMA(ma3,MA3Method,MA3Shift,MA3Method,MA3AppliedPrice));
   }
@@ -129,7 +110,7 @@ bool MACaller::InitMA3()
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
 //+------------------------------------------------------------------+
-bool MACaller::InitMA4()
+bool MovingAverages::InitMA4()
   {
    return(InitMA(ma4,MA4Method,MA4Shift,MA4Method,MA4AppliedPrice));
   }
@@ -137,21 +118,21 @@ bool MACaller::InitMA4()
 //+------------------------------------------------------------------+
 //| Create MA indicators                                             |
 //+------------------------------------------------------------------+
-bool MACaller::InitMA(CiMA *ma, int period,
-                      int shift, ENUM_MA_METHOD method, ENUM_APPLIED_PRICE appliedPrice)
+bool MovingAverages::InitMA(CiMA *ma, int period,
+                            int shift, ENUM_MA_METHOD method, ENUM_APPLIED_PRICE appliedPrice)
   {
    if(indicators == NULL)
       return(false);
 
 // initialize object
-   if(!ma.Create(GetSymbolName(), GetTimeframe(), period, shift, method, appliedPrice))
+   if(!ma.Create(Symbol(), Period(), period, shift, method, appliedPrice))
      {
       printf(__FUNCTION__ + ": error initializing ma");
       return(false);
      }
 
 // add object to collection
-   if(!indicators.Add(GetPointer(ma1)))
+   if(!indicators.Add(GetPointer(ma)))
      {
       printf(__FUNCTION__ + ": error adding ma");
       return(false);

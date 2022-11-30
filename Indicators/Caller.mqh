@@ -7,7 +7,7 @@
 #property link      "https://github.com/ThiDiamondDev"
 #property version   "1.00"
 
-#include "MACaller.mqh"
+#include "MovingAverages.mqh"
 
 
 string  VALID_ARRAYS[] = {"ma1", "ma2", "ma3", "ma4"};
@@ -25,9 +25,9 @@ enum INDICATORS
 class Caller
   {
 private:
-   MACaller          *maCaller;
+   MovingAverages          *movingAverages;
 public:
-                     Caller(string _symbolName, ENUM_TIMEFRAMES _timeframe, CIndicators *_indicators);
+                     Caller(CIndicators *_indicators);
                     ~Caller(void);
    bool              InitIndicator(int index);
    double            CallIndicator(int indicator,int callIndex);
@@ -37,9 +37,9 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-Caller::Caller(string _symbolName, ENUM_TIMEFRAMES _timeframe, CIndicators *_indicators)
+Caller::Caller(CIndicators *_indicators)
   {
-   maCaller = new MACaller(_symbolName,_timeframe,_indicators);
+   movingAverages = new MovingAverages(_indicators);
   };
 
 //+------------------------------------------------------------------+
@@ -50,13 +50,13 @@ bool    Caller::InitIndicator(int indicator)
    switch(indicator)
      {
       case  MA1:
-         return(maCaller.InitMA1());
+         return(movingAverages.InitMA1());
       case  MA2:
-         return(maCaller.InitMA2());
+         return(movingAverages.InitMA2());
       case  MA3:
-         return(maCaller.InitMA3());
+         return(movingAverages.InitMA3());
       case  MA4:
-         return(maCaller.InitMA4());
+         return(movingAverages.InitMA4());
      }
    return(false);
   }
@@ -79,13 +79,13 @@ double Caller::CallIndicator(int indicator,int callIndex)
    switch(indicator)
      {
       case  MA1:
-         return(maCaller.GetMA1(callIndex));
+         return(movingAverages.GetMA1(callIndex));
       case  MA2:
-         return(maCaller.GetMA2(callIndex));
+         return(movingAverages.GetMA2(callIndex));
       case  MA3:
-         return(maCaller.GetMA3(callIndex));
+         return(movingAverages.GetMA3(callIndex));
       case  MA4:
-         return(maCaller.GetMA4(callIndex));
+         return(movingAverages.GetMA4(callIndex));
 
      }
    return(0);
