@@ -27,7 +27,7 @@ class ExpressionParser
 private:
    string            expression_str;
    CArrayObj         expressions;
-   CArrayInt         *termIndexArray;
+   CArrayInt         termIndexArray;
    Caller            *caller;
 
    void              FillTermIndexArray(void);
@@ -38,10 +38,10 @@ private:
    bool              ResolveLogicalExpression(bool expression1, bool expression2,bool isAndCondition);
 
 public:
-                     ExpressionParser(string _expression, CIndicators *_indicators);
+                     ExpressionParser(string _expression);
                     ~ExpressionParser();
 
-   void              ResolveAllExpressions(void);
+   bool              ResolveAllExpressions(void);
    void              PrintAllSolvedExpressions();
    string            GetAllSolvedExpressions();
    bool              InitIndicators();
@@ -51,14 +51,14 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-ExpressionParser::ExpressionParser(string _expression, CIndicators *_indicators)
+ExpressionParser::ExpressionParser(string _expression)
    : expression_str(_expression)
   {
    StringReplace(expression_str, " ", "");
-   caller = new Caller(_indicators);
+   caller = new Caller();
    SplitExpressions();
    FillTermIndexArray();
-
+   int total = termIndexArray.Total();
   }
 
 //+------------------------------------------------------------------+
@@ -66,7 +66,6 @@ ExpressionParser::ExpressionParser(string _expression, CIndicators *_indicators)
 //+------------------------------------------------------------------+
 ExpressionParser::~ExpressionParser()
   {
-   delete termIndexArray;
    delete caller;
   }
 //+------------------------------------------------------------------+
@@ -131,19 +130,20 @@ bool ExpressionParser::InitIndicators()
 void ExpressionParser::ReplaceOperatorsWithTokens(string &_expression)
   {
    for(int i=0; i<TOKENS_SIZE; i++)
-      StringReplace(_expression,RELATIONAL_OPERATORS_STRING[i],(string) RELATIONAL_OPERATORS_TOKENS[i]);
+      StringReplace(_expression,RELATIONAL_OPERATORS_STRING[i],CharToString(RELATIONAL_OPERATORS_TOKENS[i]));
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void ExpressionParser::ResolveAllExpressions(void)
+bool ExpressionParser::ResolveAllExpressions(void)
   {
-   bool result = false;
    for(int i=0; i<expressions.Total(); i++)
      {
       Expression *expr= expressions.At(i);
-      expr.Resolve();
+      if(!expr.Resolve())
+         return(false);
      }
+   return true;
   }
 //+------------------------------------------------------------------+
 

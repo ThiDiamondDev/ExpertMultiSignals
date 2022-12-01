@@ -50,10 +50,15 @@ private:
 
 
 public:
-                     MovingAverages(CIndicators *_indicators):
-                     indicators(_indicators) {};
+                     MovingAverages() {
+                     ma1 = new CiMA();
+                     ma2 = new CiMA();
+                     ma3 = new CiMA();
+                     ma4 = new CiMA();
+                     indicators = new CIndicators();
+                     };
 
-                    ~MovingAverages(void);
+                    ~MovingAverages(void){delete ma1; delete ma2; delete ma3; delete ma4; delete indicators;};
    bool                 InitMA(CiMA *ma, int period,
                                int shift, ENUM_MA_METHOD method,
                                ENUM_APPLIED_PRICE appliedPrice);
@@ -74,12 +79,6 @@ public:
 
   };
 
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-MovingAverages::~MovingAverages(void)
-  {
-  }
 
 
 
@@ -88,7 +87,7 @@ MovingAverages::~MovingAverages(void)
 //+------------------------------------------------------------------+
 bool MovingAverages::InitMA1()
   {
-   return(InitMA(ma1,MA1Method,MA1Shift,MA1Method,MA1AppliedPrice));
+   return(InitMA(ma1,MA1Period,MA1Shift,MA1Method,MA1AppliedPrice));
   }
 
 //+------------------------------------------------------------------+
@@ -96,7 +95,7 @@ bool MovingAverages::InitMA1()
 //+------------------------------------------------------------------+
 bool MovingAverages::InitMA2()
   {
-   return(InitMA(ma2,MA2Method,MA2Shift,MA2Method,MA2AppliedPrice));
+   return(InitMA(ma2,MA2Period,MA2Shift,MA2Method,MA2AppliedPrice));
   }
 
 //+------------------------------------------------------------------+
@@ -104,7 +103,7 @@ bool MovingAverages::InitMA2()
 //+------------------------------------------------------------------+
 bool MovingAverages::InitMA3()
   {
-   return(InitMA(ma3,MA3Method,MA3Shift,MA3Method,MA3AppliedPrice));
+   return(InitMA(ma3,MA3Period,MA3Shift,MA3Method,MA3AppliedPrice));
   }
 
 //+------------------------------------------------------------------+
@@ -112,7 +111,7 @@ bool MovingAverages::InitMA3()
 //+------------------------------------------------------------------+
 bool MovingAverages::InitMA4()
   {
-   return(InitMA(ma4,MA4Method,MA4Shift,MA4Method,MA4AppliedPrice));
+   return(InitMA(ma4,MA4Period,MA4Shift,MA4Method,MA4AppliedPrice));
   }
 
 //+------------------------------------------------------------------+

@@ -25,10 +25,10 @@ enum INDICATORS
 class Caller
   {
 private:
-   MovingAverages          *movingAverages;
+   MovingAverages          movingAverages;
 public:
-                     Caller(CIndicators *_indicators);
-                    ~Caller(void);
+                     Caller();
+                    ~Caller(void){};
    bool              InitIndicator(int index);
    double            CallIndicator(int indicator,int callIndex);
   };
@@ -37,9 +37,9 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-Caller::Caller(CIndicators *_indicators)
+Caller::Caller()
   {
-   movingAverages = new MovingAverages(_indicators);
+   movingAverages = new MovingAverages();
   };
 
 //+------------------------------------------------------------------+

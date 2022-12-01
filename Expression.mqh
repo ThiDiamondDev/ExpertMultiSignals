@@ -36,7 +36,7 @@ private:
 
    string            GetSolutionOrError();
 
-   void              SetError(string errorMessage);
+   void              SetError(string errorMessage){error = errorMessage;};
 
 public:
                      Expression() {};
