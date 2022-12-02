@@ -8,15 +8,10 @@
 #property version   "1.00"
 
 #include "MovingAverages.mqh"
+// Include additional header
+#include <Generic/HashMap.mqh>
 
-
-string  VALID_ARRAYS[] = {"ma1", "ma2", "ma3", "ma4"};
-
-enum INDICATORS
-  {
-   MA1,MA2,MA3,MA4
-  };
-
+#include <Arrays\ArrayString.mqh>
 
 
 //+------------------------------------------------------------------+
@@ -25,12 +20,18 @@ enum INDICATORS
 class Caller
   {
 private:
-   MovingAverages          movingAverages;
+   CHashMap          <string, CallableIndicator *>   indicatorsMap;
+   CArrayString       calledIndicators;   
+   bool              InitIndicator(string indicatorName);
+   
 public:
                      Caller();
-                    ~Caller(void){};
-   bool              InitIndicator(int index);
-   double            CallIndicator(int indicator,int callIndex);
+                    ~Caller(void) {};
+   double            CallIndicator(string indicatorName,int callIndex);
+   bool              IsValidIndicator(string indicatorName);
+   void              AddCalledIndicator(string indicatorName);
+   bool              InitIndicators();
+   
   };
 
 
@@ -39,25 +40,21 @@ public:
 //+------------------------------------------------------------------+
 Caller::Caller()
   {
-   movingAverages = new MovingAverages();
+   indicatorsMap.Add("ma1", new MA1());
+   indicatorsMap.Add("ma2", new MA2());
+   indicatorsMap.Add("ma3", new MA3());
+   indicatorsMap.Add("ma4", new MA4());
   };
 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool    Caller::InitIndicator(int indicator)
+bool    Caller::InitIndicator(string indicatorName)
   {
-   switch(indicator)
-     {
-      case  MA1:
-         return(movingAverages.InitMA1());
-      case  MA2:
-         return(movingAverages.InitMA2());
-      case  MA3:
-         return(movingAverages.InitMA3());
-      case  MA4:
-         return(movingAverages.InitMA4());
-     }
+   CallableIndicator *indicator = NULL;
+   if(indicatorsMap.TryGetValue(indicatorName,indicator))
+      return(indicator.InitIndicator());
+
    return(false);
   }
 
@@ -65,29 +62,43 @@ bool    Caller::InitIndicator(int indicator)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool IsValidIndex(int index, int arraySize)
+bool    Caller::InitIndicators()
   {
-   return(index >= 0 && index < arraySize);
+   for(int index=0; index<calledIndicators.Total(); index++)
+      if(!InitIndicator(calledIndicators.At(index)))
+         return(false);
+
+   return(true);
+  }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void    Caller::AddCalledIndicator(string indicatorName)
+  {
+   if(calledIndicators.Search(indicatorName) == -1 && IsValidIndicator(indicatorName))
+      calledIndicators.Add(indicatorName);
   }
 
 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-double Caller::CallIndicator(int indicator,int callIndex)
+bool Caller::IsValidIndicator(string indicatorName)
   {
-   switch(indicator)
-     {
-      case  MA1:
-         return(movingAverages.GetMA1(callIndex));
-      case  MA2:
-         return(movingAverages.GetMA2(callIndex));
-      case  MA3:
-         return(movingAverages.GetMA3(callIndex));
-      case  MA4:
-         return(movingAverages.GetMA4(callIndex));
+   return(indicatorsMap.ContainsKey(indicatorName));
+  }
 
-     }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double Caller::CallIndicator(string indicatorName,int callIndex)
+  {
+   CallableIndicator *indicator = NULL;
+   if(indicatorsMap.TryGetValue(indicatorName,indicator))
+      return(indicator.GetData(callIndex));
+
    return(0);
   }
 //+------------------------------------------------------------------+
