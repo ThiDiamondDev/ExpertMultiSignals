@@ -36,6 +36,7 @@ private:
    bool              ResolveLogicalExpression(bool expression1, bool expression2,bool isAndCondition);
 
 public:
+                     ExpressionParser(){};
                      ExpressionParser(string _expression);
                     ~ExpressionParser();
 
