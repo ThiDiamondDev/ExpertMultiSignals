@@ -3,7 +3,7 @@
 //|                                                       ThiDiamond |
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
-#include <Expert\ExpertSignal.mqh>
+#include <Indicators\Trend.mqh>
 #include "CallableIndicator.mqh"
 
 
@@ -49,8 +49,6 @@ private:
 
 
 public:
-                     MovingAverage(void) {};
-
                     ~MovingAverage(void){};
    virtual bool              InitIndicator() {return(false);};
    virtual double            GetData(int index);
@@ -73,7 +71,6 @@ bool MovingAverage::InitMA(int period, int shift, ENUM_MA_METHOD method,
       printf(__FUNCTION__ + ": error initializing ma");
       return(false);
      }
-
 
    return(true);
   }

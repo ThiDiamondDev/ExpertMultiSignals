@@ -10,7 +10,7 @@
 #include <Arrays\ArrayObj.mqh>
 #include <Arrays\ArrayString.mqh>
 
-const string RELATIONAL_OPERATORS_STRING[] = {"==","!=",">", "<" , ">=","<="};
+const string RELATIONAL_OPERATORS_STRING[] = {"==","!=",">", "<", ">=","<="};
 const char   RELATIONAL_OPERATORS_TOKENS[] = {'=', '!', '>', '<',  '@', '#'};
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -29,15 +29,13 @@ private:
    CArrayObj         expressions;
    Caller            *caller;
 
-  string             GetExpressionStr(void) {return(expression_str);}
+   string            GetExpressionStr(void) {return(expression_str);}
    void              SplitExpressions(void);
    void              ReplaceOperatorsWithTokens(string &_expression);
-   int               SplitByOperators(string &expression,ushort &codeArray[], string &result[]);
-   bool              ResolveLogicalExpression(bool expression1, bool expression2,bool isAndCondition);
-
 public:
-                     ExpressionParser(){};
                      ExpressionParser(string _expression);
+                     ExpressionParser(){};
+
                     ~ExpressionParser();
 
    bool              ResolveAllExpressions(void);
