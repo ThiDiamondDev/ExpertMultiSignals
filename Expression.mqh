@@ -42,11 +42,7 @@ public:
                      Expression() {};
    bool              Resolve();
    bool              HasError();
-   TermType          GetTermAType();
-   TermType          GetTermBType();
-   int               GetTermAIndex(void);
-   int               GetTermBIndex(void);
-
+   
    string            GetSolvedString();
                       Expression(string a,string b, string _operator, int _operatorIndex,Caller *caller):
                      termA(a, caller), termB(b, caller), operatorValue(_operator),
@@ -83,25 +79,6 @@ bool Expression::Resolve(void)
    return false;
   }
 
-TermType Expression::GetTermAType(void)
-  {
-   return(termA.GetType());
-  }
-  
-TermType Expression::GetTermBType(void)
-  {
-   return(termB.GetType());
-  }
-  
-int Expression::GetTermAIndex(void)
-  {
-   return(termA.GetIndex());
-  }
-  
-int Expression::GetTermBIndex(void)
-  {
-   return(termB.GetIndex());
-  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+

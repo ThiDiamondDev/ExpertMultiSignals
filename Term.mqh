@@ -14,9 +14,7 @@ enum TermType
   {
    TERM_UNDEFINED,
    TERM_NUMERIC,
-   TERM_VARIABLE,
-   TERM_ARRAY,
-   TERM_EXPRESSION
+   TERM_CALLABLE
   };
 
 
@@ -39,40 +37,33 @@ private:
    string            error;
    int               index;
    TermType          type;
-   int               arrayIndex;
 
-   void              SetError(string _error) {error = _error;}
+   void              SetName(string value) {name = value;}
+   void              SetError(string value) {error = value;}
    void              SetType(TermType _type) {type = _type;}
    void              SetIndex(int _index) {index = _index;}
-   void              SetArrayIndex(int _index) {arrayIndex = _index;}
 
-   double            GetVariableValue();
-   double            GetArrayValue();
-   bool              SearchVariable(string variableName);
-   bool              SearchArrayName(string arrayName);
+   double            CallValue();
+   bool              SearchName(string arrayName);
 
-   bool              SearchTermName(string termName, string &array[],TermType _type);
-   bool              IsVariable();
    bool              IsArray();
    bool              HasError();
    double            CalculateExpressions();
 
-   int               GetArrayIndex() {return(arrayIndex);};
    string            GetName() {return(name);};
    string            GetError() {return(error);};
    bool              IsNumericValue(string value);
    int               GetNumericValue(string value);
-   void              SearchValue(string valueName,double &value);
-
 
 public:
                      Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
                      Term(string _name,Caller *_caller);
    double            GetValue();
    string            GetValueString();
-   TermType          GetType() {return(type);};
-   int               GetIndex() {return(index);};
-   
+   TermType          GetType()   {return(type);};
+   int               GetIndex()  {return(index);};
+   bool              IsNumeric() { return(IsNumericValue(GetName()));};
+
 
   };
 
@@ -80,101 +71,52 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-Term::Term(string _name,Caller *_caller): name(_name), type(TERM_UNDEFINED), index(-1),error("")
+Term::Term(string _name,Caller *_caller): error(""), caller(_caller)
   {
-  caller = _caller;
    if(IsNumericValue(GetName()))
       SetType(TERM_NUMERIC);
    else
-      if(!SearchVariable(GetName()))
-         SearchArrayName(GetName());
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-bool Term::IsVariable(void)
-  {
-   return(GetType() == TERM_VARIABLE && GetIndex() >= 0);
+      if(!SearchName(GetName()))
+         SetError("Error searching term name");
+
   }
 
 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool Term::SearchVariable(string variableName)
-  {
-   return(SearchTermName(variableName,VALID_VARIABLES, TERM_VARIABLE));
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-bool Term::SearchArrayName(string arrayName)
+bool Term::SearchName(string termName)
   {
    bool isValidTerm = false;
+   if(caller.IsValidIndicator(termName))
+      {
+         caller.AddCalledIndicator(termName);        
+         return(true);
+      }
    string splitted[], indexValue;
    int bracketsCloseIndex;
-   StringSplit(arrayName,'[',splitted);
+   StringSplit(termName,'[',splitted);
+         
    if(ArraySize(splitted) == 2)
      {
       indexValue = splitted[1];
       bracketsCloseIndex = StringLen(indexValue) - 1;
       if(StringGetCharacter(indexValue,bracketsCloseIndex) == ']')
         {
+         string callName = splitted[0];
          indexValue = StringSubstr(indexValue,0,bracketsCloseIndex);
-         isValidTerm = SearchTermName(splitted[0],VALID_ARRAYS, TERM_ARRAY);
+         isValidTerm = caller.IsValidIndicator(callName);
          if(IsNumericValue(indexValue) && isValidTerm)
            {
-            SetArrayIndex(GetNumericValue(indexValue));
+            SetName(callName);
+            SetIndex(GetNumericValue(indexValue));
+            caller.AddCalledIndicator(callName);        
             return(true);
            }
         }
      }
    return(false);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double Term::CalculateExpressions(void)
-  {
-   string splitted[];
-   double result = 0;
-   int resultSize = StringSplit(GetName(),'+',splitted);
-
-   if(resultSize > 0)
-      for(int i=0; i<resultSize - 1; i+=2)
-        {
-         double valueA, valueB;
-         SearchValue(splitted[i], valueA);
-         SearchValue(splitted[i + 1], valueB);
-         if(valueA && valueB)
-            result += valueA + valueB;
-        }
-   return(result);
-  }
-
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void Term::SearchValue(string valueName,double &value)
-  {
-   if(IsNumericValue(valueName))
-      value = GetNumericValue(valueName);
-   else
-     {
-      int varIndex = ArrayContains(valueName,VALID_VARIABLES);
-      if(varIndex >= 0)
-         value = VARIABLE_VALUES[varIndex];
-      else
-        {
-         int _arrayIndex = ArrayContains(valueName,VALID_ARRAYS);
-         if(_arrayIndex >= 0)
-            value = GetArrayValue();
-
-        }
-     }
-  }
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -199,28 +141,6 @@ int Term::GetNumericValue(string value)
   }
 
 
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-bool Term::SearchTermName(string termName, string &array[],TermType _type)
-  {
-   int _index = ArrayContains(termName,array);
-   if(_index >= 0)
-     {
-      SetType(_type);
-      SetIndex(_index);
-      return(true);
-     }
-   return(false);
-  }
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-bool Term::IsArray(void)
-  {
-   return(GetType() == TERM_ARRAY && GetIndex() >= 0 && GetArrayIndex() >= 0);
-  }
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -239,12 +159,8 @@ double Term::GetValue(void)
      {
       case TERM_NUMERIC:
          return(GetNumericValue(GetName()));
-      case TERM_VARIABLE:
-         return(GetVariableValue());
-      case TERM_ARRAY:
-         return(GetArrayValue()) ;
-      case TERM_EXPRESSION:
-         return(CalculateExpressions()) ;
+      case TERM_CALLABLE:
+         return(CallValue()) ;
 
      }
 
@@ -268,16 +184,9 @@ string Term::GetValueString(void)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-double Term::GetVariableValue(void)
+double Term::CallValue(void)
   {
-   return(VARIABLE_VALUES[GetIndex()]);
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double Term::GetArrayValue(void)
-  {
-   return(caller.CallIndicator(GetIndex(), GetArrayIndex()));
+   return(caller.CallIndicator(GetName(), GetIndex()));
   }
 
 

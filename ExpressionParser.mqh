@@ -8,7 +8,7 @@
 #include "Indicators\Caller.mqh";
 #include <Object.mqh>
 #include <Arrays\ArrayObj.mqh>
-#include <Arrays\ArrayInt.mqh>
+#include <Arrays\ArrayString.mqh>
 
 const string RELATIONAL_OPERATORS_STRING[] = {"==","!=",">","<",">=","<="};
 const char RELATIONAL_OPERATORS_TOKENS[] = {'=','!','>','<','@','#'};
@@ -27,11 +27,9 @@ class ExpressionParser
 private:
    string            expression_str;
    CArrayObj         expressions;
-   CArrayInt         termIndexArray;
-   Caller            *caller;
+  Caller            *caller;
 
-   void              FillTermIndexArray(void);
-   string            GetExpressionStr(void) {return(expression_str);}
+  string             GetExpressionStr(void) {return(expression_str);}
    void              SplitExpressions(void);
    void              ReplaceOperatorsWithTokens(string &_expression);
    int               SplitByOperators(string &expression,ushort &codeArray[], string &result[]);
@@ -57,8 +55,6 @@ ExpressionParser::ExpressionParser(string _expression)
    StringReplace(expression_str, " ", "");
    caller = new Caller();
    SplitExpressions();
-   FillTermIndexArray();
-   int total = termIndexArray.Total();
   }
 
 //+------------------------------------------------------------------+
@@ -88,40 +84,13 @@ void ExpressionParser::SplitExpressions()
                new  Expression(result[0], result[1], RELATIONAL_OPERATORS_STRING[opIdx],opIdx,caller));
         }
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void  ExpressionParser::FillTermIndexArray()
-  {
-   for(int i=0; i<expressions.Total(); i++)
-     {
-      Expression *expression= expressions.At(i);
-      if(!expression.HasError())
-        {
-         TermType typeA = expression.GetTermAType();
-         TermType typeB = expression.GetTermBType();
-         int      indexA = expression.GetTermAIndex();
-         int      indexB = expression.GetTermBIndex();
-
-         if(typeA == TERM_ARRAY && termIndexArray.Search(indexA) == -1)
-            termIndexArray.Add(indexA);
-         if(typeB == TERM_ARRAY && termIndexArray.Search(indexB) == -1)
-            termIndexArray.Add(indexB);
-
-        }
-     }
-  }
 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 bool ExpressionParser::InitIndicators()
   {
-   for(int index=0; index<termIndexArray.Total(); index++)
-      if(!caller.InitIndicator(termIndexArray.At(index)))
-         return(false);
-
-   return(true);
+   return(caller.InitIndicators());
   }
 
 //+------------------------------------------------------------------+
