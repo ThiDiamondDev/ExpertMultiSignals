@@ -41,9 +41,9 @@ public:
 Caller::Caller()
   {
    indicatorsMap.Add("ma1", new MA1());
-   indicatorsMap.Add("ma1", new MA2());
-   indicatorsMap.Add("ma1", new MA3());
-   indicatorsMap.Add("ma1", new MA4());
+   indicatorsMap.Add("ma2", new MA2());
+   indicatorsMap.Add("ma3", new MA3());
+   indicatorsMap.Add("ma4", new MA4());
   };
 
 //+------------------------------------------------------------------+

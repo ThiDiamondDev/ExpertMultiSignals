@@ -71,7 +71,7 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-Term::Term(string _name,Caller *_caller): error(""), caller(_caller)
+Term::Term(string _name,Caller *_caller): name(_name), error(""), caller(_caller)
   {
    if(IsNumericValue(GetName()))
       SetType(TERM_NUMERIC);
@@ -91,6 +91,7 @@ bool Term::SearchName(string termName)
    if(caller.IsValidIndicator(termName))
       {
          caller.AddCalledIndicator(termName);        
+         SetType(TERM_CALLABLE);
          return(true);
       }
    string splitted[], indexValue;
@@ -111,6 +112,7 @@ bool Term::SearchName(string termName)
             SetName(callName);
             SetIndex(GetNumericValue(indexValue));
             caller.AddCalledIndicator(callName);        
+            SetType(TERM_CALLABLE);
             return(true);
            }
         }

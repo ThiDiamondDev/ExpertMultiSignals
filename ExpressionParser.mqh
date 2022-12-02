@@ -10,8 +10,8 @@
 #include <Arrays\ArrayObj.mqh>
 #include <Arrays\ArrayString.mqh>
 
-const string RELATIONAL_OPERATORS_STRING[] = {"==","!=",">","<",">=","<="};
-const char RELATIONAL_OPERATORS_TOKENS[] = {'=','!','>','<','@','#'};
+const string RELATIONAL_OPERATORS_STRING[] = {"==","!=",">", "<" , ">=","<="};
+const char   RELATIONAL_OPERATORS_TOKENS[] = {'=', '!', '>', '<',  '@', '#'};
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -27,7 +27,7 @@ class ExpressionParser
 private:
    string            expression_str;
    CArrayObj         expressions;
-  Caller            *caller;
+   Caller            *caller;
 
   string             GetExpressionStr(void) {return(expression_str);}
    void              SplitExpressions(void);

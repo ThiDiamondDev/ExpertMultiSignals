@@ -45,13 +45,13 @@ input ENUM_APPLIED_PRICE   MA4AppliedPrice =  PRICE_CLOSE;   // AppliedPrice
 class MovingAverage : public CallableIndicator
   {
 private:
-   CiMA              *ma;
+   CiMA              ma;
 
 
 public:
                      MovingAverage(void) {};
 
-                    ~MovingAverage(void) { delete ma;};
+                    ~MovingAverage(void){};
    virtual bool              InitIndicator() {return(false);};
    virtual double            GetData(int index);
 
