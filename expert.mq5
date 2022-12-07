@@ -18,8 +18,8 @@ input string SellSignal = "ma1[1] < ma2[1]";  // Sell Signal
 ulong MagicNumber = 25401;                    //
 bool  EveryTick = false;                      //
 //--- inputs for main signal
-int          ThresholdOpen  = 100;            // Signal threshold value to open [0...100]
-int          ThresholdClose = 100;            // Signal threshold value to close [0...100]
+int          ThresholdOpen  = 10;            // Signal threshold value to open [0...100]
+int          ThresholdClose = 10;            // Signal threshold value to close [0...100]
 input double PriceLevel     = 0.0;            // Price level to execute a deal
 input double StopLevel      = 50.0;           // Stop Loss level (in points)
 input double TakeLevel      = 50.0;           // Take Profit level (in points)
