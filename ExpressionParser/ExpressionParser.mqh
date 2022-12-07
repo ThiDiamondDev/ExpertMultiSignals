@@ -33,7 +33,7 @@ private:
    void              SplitExpressions(void);
    void              ReplaceOperatorsWithTokens(string &_expression);
 public:
-                     ExpressionParser(string _expression);
+                     ExpressionParser(string _expression, Caller *_caller);
                      ExpressionParser(){};
 
                     ~ExpressionParser();
@@ -48,11 +48,11 @@ public:
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-ExpressionParser::ExpressionParser(string _expression)
+ExpressionParser::ExpressionParser(string _expression, Caller *_caller)
    : expression_str(_expression)
   {
    StringReplace(expression_str, " ", "");
-   caller = new Caller();
+   caller = _caller;
    SplitExpressions();
   }
 
@@ -61,7 +61,6 @@ ExpressionParser::ExpressionParser(string _expression)
 //+------------------------------------------------------------------+
 ExpressionParser::~ExpressionParser()
   {
-   delete caller;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
