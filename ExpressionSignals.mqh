@@ -46,9 +46,17 @@ public:
 
    bool              InitParser();
 
-   void              SellSignal(string value)  { sellSignal  = value;  }
-   void              BuySignal(string value)   { buySignal = value; }
-   
+   void              SellSignal(string value)
+     {
+      sellSignal  = value;
+      sellParser = new ExpressionParser(sellSignal,caller);
+     }
+   void              BuySignal(string value)
+     {
+      buySignal = value;
+      buyParser  = new ExpressionParser(buySignal,caller);
+     }
+
    // verification of settings
    virtual bool      ValidationSettings(void);
 
@@ -67,6 +75,7 @@ public:
 ExpressionSignals::ExpressionSignals(void) :
    m_pattern_0(100), caller(NULL)
   {
+   caller     = new Caller();
   }
 
 //+------------------------------------------------------------------+
@@ -74,7 +83,7 @@ ExpressionSignals::ExpressionSignals(void) :
 //+------------------------------------------------------------------+
 ExpressionSignals::~ExpressionSignals(void)
   {
-  delete caller;
+   delete caller;
   }
 //+------------------------------------------------------------------+
 //| Validation settings protected data                               |
@@ -94,16 +103,13 @@ bool ExpressionSignals::ValidationSettings(void)
 //+------------------------------------------------------------------+
 bool ExpressionSignals::InitParser(void)
   {
-   caller     = new Caller();
    if(caller == NULL)
       return false;
-   buyParser  = new ExpressionParser(buySignal,caller);
-   sellParser = new ExpressionParser(sellSignal,caller);
 
    if(buyParser.HasError() || sellParser.HasError())
       return false;
-   return true;
-
+   
+   return caller.InitIndicators();
   }
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
@@ -116,12 +122,6 @@ bool ExpressionSignals::InitIndicators(CIndicators *indicators)
       return false;
 
    if(!InitParser())
-      return false;
-
-   if(!buyParser.InitIndicators())
-      return false;
-
-   if(!sellParser.InitIndicators())
       return false;
 
    return true;

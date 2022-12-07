@@ -54,6 +54,7 @@ ExpressionParser::ExpressionParser(string _expression, Caller *_caller)
   {
    StringReplace(expression_str, " ", "");
    caller = _caller;
+   SplitExpressions();
   }
 
 //+------------------------------------------------------------------+
