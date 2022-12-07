@@ -32,7 +32,7 @@ class ExpressionSignals : public CExpertSignal
   {
 
 protected:
-
+   Caller            *caller;
    // "weights" of market models (0-100)
    int               m_pattern_0;
    ExpressionParser  buyParser,sellParser;
@@ -43,15 +43,12 @@ public:
 
    // adjusting "weights" of market models
    void              Pattern_0(int value) { m_pattern_0 = value; }
-   
-   void              InitParser() { 
-      buyParser  = new ExpressionParser(buySignal);
-      sellParser = new ExpressionParser(sellSignal); 
-   }
+
+   bool              InitParser();
 
    void              SellSignal(string value)  { sellSignal  = value;  }
    void              BuySignal(string value)   { buySignal = value; }
-
+   
    // verification of settings
    virtual bool      ValidationSettings(void);
 
@@ -68,7 +65,7 @@ public:
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
 ExpressionSignals::ExpressionSignals(void) :
-   m_pattern_0(100)
+   m_pattern_0(100), caller(NULL)
   {
   }
 
@@ -77,6 +74,7 @@ ExpressionSignals::ExpressionSignals(void) :
 //+------------------------------------------------------------------+
 ExpressionSignals::~ExpressionSignals(void)
   {
+  delete caller;
   }
 //+------------------------------------------------------------------+
 //| Validation settings protected data                               |
@@ -84,30 +82,49 @@ ExpressionSignals::~ExpressionSignals(void)
 bool ExpressionSignals::ValidationSettings(void)
   {
    if(!CExpertSignal::ValidationSettings())
-      return(false);
+      return false;
 
-   return(true);
+   return true;
   }
 
+
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool ExpressionSignals::InitParser(void)
+  {
+   caller     = new Caller();
+   if(caller == NULL)
+      return false;
+   buyParser  = new ExpressionParser(buySignal,caller);
+   sellParser = new ExpressionParser(sellSignal,caller);
+
+   if(buyParser.HasError() || sellParser.HasError())
+      return false;
+   return true;
+
+  }
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
 //+------------------------------------------------------------------+
 bool ExpressionSignals::InitIndicators(CIndicators *indicators)
   {
    if(indicators == NULL)
-      return(false);
+      return false;
    if(!CExpertSignal::InitIndicators(indicators))
-      return(false);
-      
-   InitParser();
+      return false;
+
+   if(!InitParser())
+      return false;
 
    if(!buyParser.InitIndicators())
-      return(false);
+      return false;
 
    if(!sellParser.InitIndicators())
-      return(false);
+      return false;
 
-   return(true);
+   return true;
   }
 //+------------------------------------------------------------------+
 //| "Voting" that price will grow                                    |
@@ -115,8 +132,8 @@ bool ExpressionSignals::InitIndicators(CIndicators *indicators)
 int ExpressionSignals::LongCondition(void)
   {
    if(buyParser.ResolveAllExpressions())
-      return(m_pattern_0);
-   return(0);
+      return m_pattern_0;
+   return 0;
   }
 
 //+------------------------------------------------------------------+
@@ -125,8 +142,8 @@ int ExpressionSignals::LongCondition(void)
 int ExpressionSignals::ShortCondition(void)
   {
    if(sellParser.ResolveAllExpressions())
-      return(m_pattern_0);
+      return m_pattern_0;
 
-   return(0);
+   return 0;
   }
 //+------------------------------------------------------------------+
