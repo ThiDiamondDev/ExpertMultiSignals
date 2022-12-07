@@ -17,7 +17,7 @@ Currentily suported Terms:
 
 -ma1[i], ma2[i], ma3[i], ma4[i]
 
-There are still working in progress.
+There is still working in progress.
 The purpose of the project is just for study and apply programming concepts.
 Running expert advisors on real account can lead to the total loss of your capital.
 Don't risk.
