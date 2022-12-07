@@ -42,6 +42,7 @@ public:
    void              PrintAllSolvedExpressions();
    string            GetAllSolvedExpressions();
    bool              InitIndicators();
+   bool              HasError();
 
   };
 
@@ -52,8 +53,7 @@ ExpressionParser::ExpressionParser(string _expression, Caller *_caller)
    : expression_str(_expression)
   {
    StringReplace(expression_str, " ", "");
-   caller = _caller;
-   SplitExpressions();
+   caller = _ca
   }
 
 //+------------------------------------------------------------------+
@@ -73,7 +73,8 @@ void ExpressionParser::SplitExpressions()
    ReplaceOperatorsWithTokens(expression);
 
    StringSplit(expression, LOGICAL_OPERATORS[0],_expressions);
-   for(int expIdx = 0; expIdx < ArraySize(_expressions); expIdx++)
+   for(int expIdx = 0; expIdx ller;
+   SplitExpressions();< ArraySize(_expressions); expIdx++)
       for(int opIdx=0; opIdx < ArraySize(RELATIONAL_OPERATORS_TOKENS) ; opIdx++)
         {
          string result[];
@@ -146,3 +147,16 @@ string ExpressionParser::GetAllSolvedExpressions(void)
    return(solution);
   }
 //+------------------------------------------------------------------+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool ExpressionParser::HasError(void)
+  {
+   for(int i=0; i<expressions.Total(); i++)
+     {
+      Expression *expr= expressions.At(i);
+      if(expr.HasError())
+         return(true);
+     }
+   return(false);
+  }
