@@ -76,18 +76,6 @@ int OnInit()
    signal.BuySignal(BuySignal);
    signal.SellSignal(SellSignal);
 
-//--- Creating filter ExpressionSignals
-   ExpressionSignals *filter0 = new ExpressionSignals;
-   if(filter0 == NULL)
-     {
-      //--- failed
-      printf(__FUNCTION__ + ": error creating filter0");
-      ExtExpert.Deinit();
-      return (INIT_FAILED);
-     }
-   signal.AddFilter(filter0);
-//--- Set filter parameters
-   filter0.Weight(Weight);
 //--- Creation of trailing object
    CTrailingNone *trailing = new CTrailingNone;
    if(trailing == NULL)
