@@ -43,19 +43,9 @@ public:
 
    // adjusting "weights" of market models
    void              Pattern_0(int value) { m_pattern_0 = value; }
-
    bool              InitParser();
-
-   void              SellSignal(string value)
-     {
-      sellSignal  = value;
-      sellParser = new ExpressionParser(sellSignal,caller);
-     }
-   void              BuySignal(string value)
-     {
-      buySignal = value;
-      buyParser  = new ExpressionParser(buySignal,caller);
-     }
+   void              SellSignal(string value);
+   void              BuySignal(string value);
 
    // verification of settings
    virtual bool      ValidationSettings(void);
@@ -73,7 +63,7 @@ public:
 //| Constructor                                                      |
 //+------------------------------------------------------------------+
 ExpressionSignals::ExpressionSignals(void) :
-   m_pattern_0(100), caller(NULL)
+   m_pattern_0(100)
   {
    caller     = new Caller();
   }
@@ -97,7 +87,22 @@ bool ExpressionSignals::ValidationSettings(void)
   }
 
 
-
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void ExpressionSignals::BuySignal(string signal)
+  {
+   buySignal  = signal;
+   buyParser = new ExpressionParser(buySignal,caller);
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void ExpressionSignals::SellSignal(string signal)
+  {
+   sellSignal  = signal;
+   sellParser = new ExpressionParser(sellSignal,caller);
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -108,7 +113,7 @@ bool ExpressionSignals::InitParser(void)
 
    if(buyParser.HasError() || sellParser.HasError())
       return false;
-   
+
    return caller.InitIndicators();
   }
 //+------------------------------------------------------------------+
