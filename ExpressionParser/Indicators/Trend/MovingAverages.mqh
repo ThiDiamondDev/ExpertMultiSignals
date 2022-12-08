@@ -4,7 +4,7 @@
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
 #include <Indicators\Trend.mqh>
-#include "CallableIndicator.mqh"
+#include "../CallableIndicator.mqh"
 
 
 input group                "Moving average 1"
@@ -49,7 +49,7 @@ private:
 
 
 public:
-                    ~MovingAverage(void){};
+                    ~MovingAverage(void) {};
    virtual bool              InitIndicator() {return(false);};
    virtual double            GetData(int index);
 
