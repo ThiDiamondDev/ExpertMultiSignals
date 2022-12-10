@@ -7,17 +7,18 @@
 #property link      "https://github.com/ThiDiamondDev"
 #property version   "1.00"
 
-#include"ExpressionParser.mqh";
+#include"ExpressionParser/ExpressionParser.mqh";
 //+------------------------------------------------------------------+
 //| Script program start function                                    |
 //+------------------------------------------------------------------+
 void OnStart()
   {
 //---
-   string expression = "array1[1] > array2[5] & 50 > 40";
-   ExpressionParser parser(expression);
+   Caller *caller = new Caller();
+   string expression = "5 > 5";
+   ExpressionParser parser(expression, caller);
    
-   string solution = parser.GetAllSolvedExpressions();
-   parser.PrintAllSolvedExpressions();
+   bool solution = parser.ResolveAllExpressions();
+   
   }
 //+------------------------------------------------------------------+

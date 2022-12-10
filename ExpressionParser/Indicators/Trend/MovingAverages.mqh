@@ -50,8 +50,9 @@ private:
 
 public:
                     ~MovingAverage(void) {};
-   virtual bool              InitIndicator() {return(false);};
+   virtual bool              InitIndicator(CIndicators *indicators) {return(false);};
    virtual double            GetData(int index);
+   virtual void*             GetIndicator() { return GetPointer(ma);};
 
    bool              InitMA(int period,
                             int shift, ENUM_MA_METHOD method,
@@ -77,11 +78,8 @@ bool MovingAverage::InitMA(int period, int shift, ENUM_MA_METHOD method,
 //+------------------------------------------------------------------+
 double MovingAverage::GetData(int index)
   {
-   return(ma.Main(index));
+   return ma.Main(index);
   };
-
-
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -90,15 +88,10 @@ class MA1: public MovingAverage
 public:
    virtual bool      InitIndicator() override
      {
-      return(InitMA(MA1Period,MA1Shift,MA1Method,MA1AppliedPrice));
+      return InitMA(MA1Period,MA1Shift,MA1Method,MA1AppliedPrice);
      };
 
   };
-//+------------------------------------------------------------------+
-
-
-
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -107,13 +100,10 @@ class MA2: public MovingAverage
 public:
    virtual bool      InitIndicator() override
      {
-      return(InitMA(MA2Period,MA2Shift,MA2Method,MA2AppliedPrice));
+      return InitMA(MA2Period,MA2Shift,MA2Method,MA2AppliedPrice);
      };
 
   };
-//+------------------------------------------------------------------+
-
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -122,13 +112,10 @@ class MA3: public MovingAverage
 public:
    virtual bool      InitIndicator() override
      {
-      return(InitMA(MA3Period,MA3Shift,MA3Method,MA3AppliedPrice));
+      return InitMA(MA3Period,MA3Shift,MA3Method,MA3AppliedPrice);
      };
 
   };
-//+------------------------------------------------------------------+
-
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -137,7 +124,7 @@ class MA4: public MovingAverage
 public:
    virtual bool      InitIndicator() override
      {
-      return(InitMA(MA4Period,MA4Shift,MA4Method,MA4AppliedPrice));
+      return InitMA(MA4Period,MA4Shift,MA4Method,MA4AppliedPrice);
      };
 
   };

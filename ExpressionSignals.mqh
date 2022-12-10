@@ -43,7 +43,6 @@ public:
 
    // adjusting "weights" of market models
    void              Pattern_0(int value) { m_pattern_0 = value; }
-   bool              InitParser();
    void              SellSignal(string value);
    void              BuySignal(string value);
 
@@ -83,6 +82,12 @@ bool ExpressionSignals::ValidationSettings(void)
    if(!CExpertSignal::ValidationSettings())
       return false;
 
+   if(buyParser.HasError())
+      return false;
+
+   if(sellParser.HasError())
+      return false;
+
    return true;
   }
 
@@ -104,19 +109,6 @@ void ExpressionSignals::SellSignal(string signal)
    sellParser = new ExpressionParser(sellSignal,caller);
   }
 //+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-bool ExpressionSignals::InitParser(void)
-  {
-   if(caller == NULL)
-      return false;
-
-   if(buyParser.HasError() || sellParser.HasError())
-      return false;
-
-   return caller.InitIndicators();
-  }
-//+------------------------------------------------------------------+
 //| Create indicators                                                |
 //+------------------------------------------------------------------+
 bool ExpressionSignals::InitIndicators(CIndicators *indicators)
@@ -126,9 +118,8 @@ bool ExpressionSignals::InitIndicators(CIndicators *indicators)
    if(!CExpertSignal::InitIndicators(indicators))
       return false;
 
-   if(!InitParser())
+   if(!caller.InitIndicators(indicators))
       return false;
-
    return true;
   }
 //+------------------------------------------------------------------+
@@ -136,7 +127,7 @@ bool ExpressionSignals::InitIndicators(CIndicators *indicators)
 //+------------------------------------------------------------------+
 int ExpressionSignals::LongCondition(void)
   {
-   if(buyParser.ResolveAllExpressions())
+   if(buyParser.Resolve())
       return m_pattern_0;
    return 0;
   }
@@ -146,7 +137,7 @@ int ExpressionSignals::LongCondition(void)
 //+------------------------------------------------------------------+
 int ExpressionSignals::ShortCondition(void)
   {
-   if(sellParser.ResolveAllExpressions())
+   if(sellParser.Resolve())
       return m_pattern_0;
 
    return 0;
