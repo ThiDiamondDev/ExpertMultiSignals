@@ -34,22 +34,17 @@ private:
    string            operatorValue,  error, expressionStr;
    int               operatorIndex;
 
-   string            GetSolutionOrError();
-
-   void              SetError(string errorMessage){error = errorMessage;};
+   void              SetError(string errorMessage) {error = errorMessage;};
 
 public:
-                     Expression() {};
    bool              Resolve();
    bool              HasError();
-   
+
    string            GetSolvedString();
-                      Expression(string a,string b, string _operator, int _operatorIndex,Caller *caller):
+                     Expression(string a,string b, string _operator, int _operatorIndex,Caller *caller):
                      termA(a, caller), termB(b, caller), operatorValue(_operator),
                      operatorIndex(_operatorIndex), error(""),expressionStr(a+_operator+b) {}
   };
-
-//+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -78,16 +73,6 @@ bool Expression::Resolve(void)
      }
    return false;
   }
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-string Expression::GetSolutionOrError(void)
-  {
-   bool solution = Resolve();
-   return (HasError()? error: (string) solution);
-  }
-//+------------------------------------------------------------------+
 
 //+------------------------------------------------------------------+
 //|                                                                  |

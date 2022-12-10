@@ -7,7 +7,6 @@
 #property link      "https://github.com/ThiDiamondDev"
 #property version   "1.00"
 
-#include "Variable.mqh";
 #include "Indicators/Caller.mqh";
 
 enum TermType
@@ -89,15 +88,15 @@ bool Term::SearchName(string termName)
   {
    bool isValidTerm = false;
    if(caller.IsValidIndicator(termName))
-      {
-         caller.AddCalledIndicator(termName);        
-         SetType(TERM_CALLABLE);
-         return(true);
-      }
+     {
+      caller.AddCalledIndicator(termName);
+      SetType(TERM_CALLABLE);
+      return(true);
+     }
    string splitted[], indexValue;
    int bracketsCloseIndex;
    StringSplit(termName,'[',splitted);
-         
+
    if(ArraySize(splitted) == 2)
      {
       indexValue = splitted[1];
@@ -111,7 +110,7 @@ bool Term::SearchName(string termName)
            {
             SetName(callName);
             SetIndex(GetNumericValue(indexValue));
-            caller.AddCalledIndicator(callName);        
+            caller.AddCalledIndicator(callName);
             SetType(TERM_CALLABLE);
             return(true);
            }

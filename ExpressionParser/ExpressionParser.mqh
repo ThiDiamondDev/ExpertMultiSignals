@@ -34,14 +34,9 @@ private:
    void              ReplaceOperatorsWithTokens(string &_expression);
 public:
                      ExpressionParser(string _expression, Caller *_caller);
-                     ExpressionParser(){};
+                     ExpressionParser() {};
 
-                    ~ExpressionParser();
-
-   bool              ResolveAllExpressions(void);
-   void              PrintAllSolvedExpressions();
-   string            GetAllSolvedExpressions();
-   bool              InitIndicators();
+   bool              Resolve(void);
    bool              HasError();
 
   };
@@ -57,12 +52,6 @@ ExpressionParser::ExpressionParser(string _expression, Caller *_caller)
    SplitExpressions();
   }
 
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-ExpressionParser::~ExpressionParser()
-  {
-  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -87,14 +76,6 @@ void ExpressionParser::SplitExpressions()
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool ExpressionParser::InitIndicators()
-  {
-   return(caller.InitIndicators());
-  }
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
 void ExpressionParser::ReplaceOperatorsWithTokens(string &_expression)
   {
    for(int i=0; i<TOKENS_SIZE; i++)
@@ -103,50 +84,16 @@ void ExpressionParser::ReplaceOperatorsWithTokens(string &_expression)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool ExpressionParser::ResolveAllExpressions(void)
+bool ExpressionParser::Resolve(void)
   {
    for(int i=0; i<expressions.Total(); i++)
      {
       Expression *expr= expressions.At(i);
       if(!expr.Resolve())
-         return(false);
+         return false;
      }
    return true;
   }
-//+------------------------------------------------------------------+
-
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void ExpressionParser::PrintAllSolvedExpressions(void)
-  {
-   for(int i=0; i<expressions.Total(); i++)
-     {
-      Expression *expression= expressions.At(i);
-      Print("Expression[" + IntegerToString(i) + "]");
-      Print(expression.GetSolvedString());
-     }
-  }
-//+------------------------------------------------------------------+
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-string ExpressionParser::GetAllSolvedExpressions(void)
-  {
-   string solution = "";
-   for(int i=0; i<expressions.Total(); i++)
-     {
-      Expression *expression= expressions.At(i);
-      if(i > 0)
-         solution += " & ";
-
-      solution += expression.GetSolvedString();
-     }
-   return(solution);
-  }
-//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -156,7 +103,7 @@ bool ExpressionParser::HasError(void)
      {
       Expression *expr= expressions.At(i);
       if(expr.HasError())
-         return(true);
+         return true;
      }
-   return(false);
+   return false;
   }
