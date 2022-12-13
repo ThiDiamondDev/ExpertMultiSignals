@@ -14,7 +14,7 @@
 #include "Trend/BollingerBands.mqh"
 #include "Trend/Dema.mqh"
 #include "Trend/Envelopes.mqh"
-
+#include "Trend/FrAMA.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -61,6 +61,7 @@ void IndicatorsMap::Init()
    Add("envelopes_upper", new EnvelopesUpper());
    Add("envelopes_lower", new EnvelopesLower());
    
+   Add("frama", new FrAMA());
   };
 
 //+------------------------------------------------------------------+
