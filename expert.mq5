@@ -11,9 +11,9 @@
 //| Inputs                                                           |
 //+------------------------------------------------------------------+
 //--- inputs for expert
-input string Title      = "expert";                 // Document name
-input string BuySignal  = "ma1[0] >= ma2[0]";  // Buy Signal
-input string SellSignal = "ma1[0] < ma2[0]";  // Sell Signal
+input string Title      = "expert";                      // Document name
+input string BuySignal  = "adx_plus[1] > adx_minus[1]";  // Buy Signal
+input string SellSignal = "adx_plus[1] < adx_minus[1]";  // Sell Signal
 
 ulong MagicNumber = 25401;                    //
 bool  EveryTick = false;                      //

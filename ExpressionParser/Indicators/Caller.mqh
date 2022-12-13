@@ -9,6 +9,7 @@
 #include <Generic/HashMap.mqh>
 #include <Arrays/ArrayString.mqh>
 #include "Trend/MovingAverages.mqh"
+#include "Trend/ADX.mqh"
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -39,6 +40,10 @@ Caller::Caller()
    indicatorsMap.Add("ma2", new MA2());
    indicatorsMap.Add("ma3", new MA3());
    indicatorsMap.Add("ma4", new MA4());
+   
+   indicatorsMap.Add("adx_main", new ADXMain());
+   indicatorsMap.Add("adx_plus", new ADXPlus());
+   indicatorsMap.Add("adx_minus",new ADXMinus());
   };
 
 //+------------------------------------------------------------------+
