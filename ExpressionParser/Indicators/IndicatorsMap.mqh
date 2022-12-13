@@ -12,6 +12,8 @@
 #include "Trend/ADX.mqh"
 #include "Trend/ADXWilder.mqh"
 #include "Trend/BollingerBands.mqh"
+#include "Trend/Dema.mqh"
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -52,6 +54,8 @@ void IndicatorsMap::Init()
    Add("bb_upper", new BBUpper());
    Add("bb_base",  new BBBase());
    Add("bb_lower", new BBLower());
+
+   Add("dema", new Dema());
 
   };
 
