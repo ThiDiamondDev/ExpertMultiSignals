@@ -10,7 +10,7 @@
 #include <Arrays/ArrayString.mqh>
 #include "Trend/MovingAverages.mqh"
 #include "Trend/ADX.mqh"
-
+#include "Trend/ADXWilder.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -44,6 +44,10 @@ Caller::Caller()
    indicatorsMap.Add("adx_main", new ADXMain());
    indicatorsMap.Add("adx_plus", new ADXPlus());
    indicatorsMap.Add("adx_minus",new ADXMinus());
+  
+   indicatorsMap.Add("adx_wilder_main", new ADXWilderMain());
+   indicatorsMap.Add("adx_wilder_plus", new ADXWilderPlus());
+   indicatorsMap.Add("adx_wilder_minus",new ADXWilderMinus());
   };
 
 //+------------------------------------------------------------------+
