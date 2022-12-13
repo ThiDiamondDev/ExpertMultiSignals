@@ -11,6 +11,7 @@
 #include "Trend/MovingAverages.mqh"
 #include "Trend/ADX.mqh"
 #include "Trend/ADXWilder.mqh"
+#include "Trend/BollingerBands.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -47,6 +48,11 @@ void IndicatorsMap::Init()
    Add("adx_wilder_main", new ADXWilderMain());
    Add("adx_wilder_plus", new ADXWilderPlus());
    Add("adx_wilder_minus",new ADXWilderMinus());
+
+   Add("bb_upper", new BBUpper());
+   Add("bb_base",  new BBBase());
+   Add("bb_lower", new BBLower());
+
   };
 
 //+------------------------------------------------------------------+
