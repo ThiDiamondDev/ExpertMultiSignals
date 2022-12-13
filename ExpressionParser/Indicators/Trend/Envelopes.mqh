@@ -7,9 +7,9 @@
 #include "../CallableIndicator.mqh"
 
 input group "Envelopes"
-input int EnvelopesPeriod                       = 14; // Period
-input double EnvelopesDeviation                    = 2;  // Deviation
-input int EnvelopesShift                        = 0;  // Shift
+input int EnvelopesPeriod                       = 14;           // Period
+input double EnvelopesDeviation                 = 0.1;          // Deviation
+input int EnvelopesShift                        = 0;            // Shift
 input ENUM_APPLIED_PRICE EnvelopesAppliedPrice  = PRICE_CLOSE;  // Applied Price
 input ENUM_MA_METHOD     EnvelopesMethod        = MODE_SMA;     // Price Method
 
