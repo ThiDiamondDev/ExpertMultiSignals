@@ -13,6 +13,7 @@
 #include "Trend/ADXWilder.mqh"
 #include "Trend/BollingerBands.mqh"
 #include "Trend/Dema.mqh"
+#include "Trend/Envelopes.mqh"
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -57,6 +58,9 @@ void IndicatorsMap::Init()
 
    Add("dema", new Dema());
 
+   Add("envelopes_upper", new EnvelopesUpper());
+   Add("envelopes_lower", new EnvelopesLower());
+   
   };
 
 //+------------------------------------------------------------------+
