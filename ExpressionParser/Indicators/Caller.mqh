@@ -6,18 +6,16 @@
 #property copyright "ThiDiamond"
 #property link "https://github.com/ThiDiamondDev"
 #property version "1.00"
-#include <Generic/HashMap.mqh>
 #include <Arrays/ArrayString.mqh>
-#include "Trend/MovingAverages.mqh"
-#include "Trend/ADX.mqh"
-#include "Trend/ADXWilder.mqh"
+#include "IndicatorsMap.mqh"
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 class Caller
   {
 private:
-   CHashMap<string, CallableIndicator *> indicatorsMap;
+   IndicatorsMap     indicatorsMap;
    CArrayString      calledIndicators;
    CIndicators       indicatorsArray;
    bool              InitIndicator(string indicatorName);
@@ -36,18 +34,6 @@ public:
 //+------------------------------------------------------------------+
 Caller::Caller()
   {
-   indicatorsMap.Add("ma1", new MA1());
-   indicatorsMap.Add("ma2", new MA2());
-   indicatorsMap.Add("ma3", new MA3());
-   indicatorsMap.Add("ma4", new MA4());
-   
-   indicatorsMap.Add("adx_main", new ADXMain());
-   indicatorsMap.Add("adx_plus", new ADXPlus());
-   indicatorsMap.Add("adx_minus",new ADXMinus());
-  
-   indicatorsMap.Add("adx_wilder_main", new ADXWilderMain());
-   indicatorsMap.Add("adx_wilder_plus", new ADXWilderPlus());
-   indicatorsMap.Add("adx_wilder_minus",new ADXWilderMinus());
   };
 
 //+------------------------------------------------------------------+
