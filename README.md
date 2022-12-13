@@ -15,9 +15,9 @@ The EA parses expressions provided by buySignal and sellSignal to init indicator
 
 Currentily suported Terms:
 
--numeric integer values
--ma1[], ma2[], ma3[], ma4[]
--adx_plus[], adx_plus[], adx_minus[]
+- numeric integer values
+- ma1[], ma2[], ma3[], ma4[]
+- adx_plus[], adx_plus[], adx_minus[]
 
 There is still working in progress.
 The purpose of the project is just for study and apply programming concepts.
