@@ -18,6 +18,7 @@
 #include "Trend/Ichimoku.mqh"
 #include "Trend/MovingAverages.mqh"
 #include "Trend/ParabolicSAR.mqh"
+#include "Trend/StdDev.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -75,6 +76,8 @@ void IndicatorsMap::Init()
    Add("chikou_span",   new IchimokuChikouSpan());
 
    Add("parabolic_sar",   new ParabolicSAR());
+    
+   Add("std_dev",   new StdDev());
 
   };
 
