@@ -15,6 +15,7 @@
 #include "Trend/Dema.mqh"
 #include "Trend/Envelopes.mqh"
 #include "Trend/FrAMA.mqh"
+#include "Trend/Ichimoku.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -60,8 +61,14 @@ void IndicatorsMap::Init()
 
    Add("envelopes_upper", new EnvelopesUpper());
    Add("envelopes_lower", new EnvelopesLower());
-   
+
    Add("frama", new FrAMA());
+
+   Add("tenkan_sen",    new IchimokuTenkanSen());
+   Add("kijun_sen",     new IchimokuKijunSen());
+   Add("senkou_span_a", new IchimokuSenkouSpanA());
+   Add("senkou_span_b", new IchimokuSenkouSpanB());
+   Add("chikou_span",   new IchimokuChikouSpan());
   };
 
 //+------------------------------------------------------------------+
