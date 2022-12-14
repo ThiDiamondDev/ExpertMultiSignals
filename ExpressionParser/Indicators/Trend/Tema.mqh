@@ -7,7 +7,7 @@
 #include "../CallableIndicator.mqh"
 
 
-input group                "Double Exponential Moving Average"
+input group                "Triple Exponential Moving Average"
 
 input int                  TemaPeriod       =  14;             // Period
 input int                  TemaShift        =  0;             // Shift
