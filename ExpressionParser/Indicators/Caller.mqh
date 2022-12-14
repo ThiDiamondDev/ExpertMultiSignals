@@ -23,10 +23,10 @@ private:
 public:
                      Caller();
                     ~Caller(void) {};
-   double            CallIndicator(string indicatorName, int callIndex);
    bool              IsValidIndicator(string indicatorName);
    void              AddCalledIndicator(string indicatorName);
    bool              InitIndicators(CIndicators *indicators);
+   bool              TryGetIndicator(string name, CallableIndicator *&indicator);
   };
 
 //+------------------------------------------------------------------+
@@ -81,12 +81,8 @@ bool Caller::IsValidIndicator(string indicatorName)
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-double Caller::CallIndicator(string indicatorName, int callIndex)
+bool Caller::TryGetIndicator(string name, CallableIndicator *&indicator)
   {
-   CallableIndicator *indicator = NULL;
-   if(indicatorsMap.TryGetValue(indicatorName, indicator))
-      return (indicator.GetData(callIndex));
-
-   return (0);
+   return indicatorsMap.TryGetValue(name, indicator);
   }
 //+------------------------------------------------------------------+

@@ -32,6 +32,7 @@ class Term
   {
 private:
    Caller            *caller;
+   CallableIndicator *indicator;
    string            name;
    string            error;
    int               index;
@@ -45,9 +46,7 @@ private:
    double            CallValue();
    bool              SearchName(string arrayName);
 
-   bool              IsArray();
    bool              HasError();
-   double            CalculateExpressions();
 
    string            GetName() {return(name);};
    string            GetError() {return(error);};
@@ -57,6 +56,7 @@ private:
 public:
                      Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
                      Term(string _name,Caller *_caller);
+                     ~Term();
    double            GetValue();
    string            GetValueString();
    TermType          GetType()   {return(type);};
@@ -80,6 +80,15 @@ Term::Term(string _name,Caller *_caller): name(_name), error(""), caller(_caller
 
   }
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+Term::~Term()
+  {
+   delete indicator;
+   delete caller;
+  }
+
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -87,11 +96,11 @@ Term::Term(string _name,Caller *_caller): name(_name), error(""), caller(_caller
 bool Term::SearchName(string termName)
   {
    bool isValidTerm = false;
-   if(caller.IsValidIndicator(termName))
+   if(caller.TryGetIndicator(termName,indicator))
      {
       caller.AddCalledIndicator(termName);
       SetType(TERM_CALLABLE);
-      return(true);
+      return true;
      }
    string splitted[], indexValue;
    int bracketsCloseIndex;
@@ -110,9 +119,9 @@ bool Term::SearchName(string termName)
            {
             SetName(callName);
             SetIndex(GetNumericValue(indexValue));
-            caller.AddCalledIndicator(callName);
             SetType(TERM_CALLABLE);
-            return(true);
+            caller.AddCalledIndicator(callName);
+            return caller.TryGetIndicator(callName,indicator);
            }
         }
      }
@@ -178,8 +187,8 @@ string Term::GetValueString(void)
    if(HasError())
       return(error);
    if(GetType() == TERM_NUMERIC)
-      return(DoubleToString(GetValue(), 0));
-   return(DoubleToString(GetValue()));
+      return DoubleToString(GetValue(), 0);
+   return DoubleToString(GetValue());
   }
 
 //+------------------------------------------------------------------+
@@ -187,7 +196,7 @@ string Term::GetValueString(void)
 //+------------------------------------------------------------------+
 double Term::CallValue(void)
   {
-   return(caller.CallIndicator(GetName(), GetIndex()));
+   return indicator.GetData(GetIndex());
   }
 
 
