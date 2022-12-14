@@ -8,7 +8,7 @@
 #property version "1.00"
 
 #include <Generic/HashMap.mqh>
-#include "Trend/MovingAverages.mqh"
+#include "Trend/AMA.mqh"
 #include "Trend/ADX.mqh"
 #include "Trend/ADXWilder.mqh"
 #include "Trend/BollingerBands.mqh"
@@ -16,7 +16,8 @@
 #include "Trend/Envelopes.mqh"
 #include "Trend/FrAMA.mqh"
 #include "Trend/Ichimoku.mqh"
-#include "Trend/AMA.mqh"
+#include "Trend/MovingAverages.mqh"
+#include "Trend/ParabolicSAR.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -72,6 +73,9 @@ void IndicatorsMap::Init()
    Add("senkou_span_a", new IchimokuSenkouSpanA());
    Add("senkou_span_b", new IchimokuSenkouSpanB());
    Add("chikou_span",   new IchimokuChikouSpan());
+
+   Add("parabolic_sar",   new ParabolicSAR());
+
   };
 
 //+------------------------------------------------------------------+
