@@ -20,6 +20,7 @@
 #include "Trend/ParabolicSAR.mqh"
 #include "Trend/StdDev.mqh"
 #include "Trend/Tema.mqh"
+#include "Trend/Vidya.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -79,7 +80,10 @@ void IndicatorsMap::Init()
    Add("parabolic_sar",   new ParabolicSAR());
     
    Add("std_dev",   new StdDev());
+   
    Add("tema",   new Tema());
+
+   Add("vidya",   new Vidya());
 
   };
 
