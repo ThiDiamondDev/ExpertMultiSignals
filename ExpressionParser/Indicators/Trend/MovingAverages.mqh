@@ -46,11 +46,7 @@ class MovingAverage : public CallableIndicator
   {
 private:
    CiMA              ma;
-
-
 public:
-                    ~MovingAverage(void) {};
-   virtual bool              InitIndicator(CIndicators *indicators) {return(false);};
    virtual double            GetData(int index);
    virtual void*             GetIndicator() { return GetPointer(ma);};
 

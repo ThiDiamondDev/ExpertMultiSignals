@@ -16,6 +16,7 @@
 #include "Trend/Envelopes.mqh"
 #include "Trend/FrAMA.mqh"
 #include "Trend/Ichimoku.mqh"
+#include "Trend/AMA.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -40,6 +41,8 @@ IndicatorsMap::IndicatorsMap(void)
 //+------------------------------------------------------------------+
 void IndicatorsMap::Init()
   {
+   Add("ama", new AMA());
+  
    Add("ma1", new MA1());
    Add("ma2", new MA2());
    Add("ma3", new MA3());
