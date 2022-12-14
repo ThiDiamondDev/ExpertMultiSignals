@@ -17,14 +17,11 @@
 //| Parameter=BuySignal,string,ma1[1] > ma2[1],Buy Signal            |
 //| Parameter=SellSignal,string,ma1[1] < ma2[1],Sell Signal          |
 //+------------------------------------------------------------------+
-
 // wizard description end
-
 //+------------------------------------------------------------------+
 //| Class ExpressionSignals.                                         |
 //| Purpose: MultiSIgnals                                            |
 //+------------------------------------------------------------------+
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -32,16 +29,11 @@ class ExpressionSignals : public CExpertSignal
   {
 
 protected:
-   Caller            *caller;
-   // "weights" of market models (0-100)
+   Caller            caller;
    int               m_pattern_0;
    ExpressionParser  buyParser,sellParser;
-   string            buySignal, sellSignal;
 public:
-                     ExpressionSignals(void);
-                    ~ExpressionSignals(void);
-
-   // adjusting "weights" of market models
+                     ExpressionSignals(void) : m_pattern_0(100) {};
    void              Pattern_0(int value) { m_pattern_0 = value; }
    void              SellSignal(string value);
    void              BuySignal(string value);
@@ -57,23 +49,6 @@ public:
    virtual int       ShortCondition(void);
 
   };
-
-//+------------------------------------------------------------------+
-//| Constructor                                                      |
-//+------------------------------------------------------------------+
-ExpressionSignals::ExpressionSignals(void) :
-   m_pattern_0(100)
-  {
-   caller     = new Caller();
-  }
-
-//+------------------------------------------------------------------+
-//| Destructor                                                       |
-//+------------------------------------------------------------------+
-ExpressionSignals::~ExpressionSignals(void)
-  {
-   delete caller;
-  }
 //+------------------------------------------------------------------+
 //| Validation settings protected data                               |
 //+------------------------------------------------------------------+
@@ -91,22 +66,19 @@ bool ExpressionSignals::ValidationSettings(void)
    return true;
   }
 
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 void ExpressionSignals::BuySignal(string signal)
   {
-   buySignal  = signal;
-   buyParser = new ExpressionParser(buySignal,caller);
+   buyParser = new ExpressionParser(signal,GetPointer(caller));
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 void ExpressionSignals::SellSignal(string signal)
   {
-   sellSignal  = signal;
-   sellParser = new ExpressionParser(sellSignal,caller);
+   sellParser = new ExpressionParser(signal,GetPointer(caller));
   }
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
