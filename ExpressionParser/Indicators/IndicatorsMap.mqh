@@ -21,6 +21,13 @@
 #include "Trend/StdDev.mqh"
 #include "Trend/Tema.mqh"
 #include "Trend/Vidya.mqh"
+
+#include "Volumes/AD.mqh"
+#include "Volumes/MFI.mqh"
+#include "Volumes/OBV.mqh"
+#include "Volumes/Volumes.mqh"
+
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -28,9 +35,9 @@ class IndicatorsMap: public CHashMap<string, CallableIndicator *>
   {
 public:
                      IndicatorsMap();
-   void              Init();
+   void              AddTrendIndicators();
+   void              AddVolumeIndicators();
   };
-
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -38,15 +45,16 @@ public:
 IndicatorsMap::IndicatorsMap(void)
   {
    ::CHashMap<string, CallableIndicator *>();
-   Init();
+   AddTrendIndicators();
+   AddVolumeIndicators();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-void IndicatorsMap::Init()
+void IndicatorsMap::AddTrendIndicators()
   {
    Add("ama", new AMA());
-  
+
    Add("ma1", new MA1());
    Add("ma2", new MA2());
    Add("ma3", new MA3());
@@ -78,13 +86,23 @@ void IndicatorsMap::Init()
    Add("chikou_span",   new IchimokuChikouSpan());
 
    Add("parabolic_sar",   new ParabolicSAR());
-    
+
    Add("std_dev",   new StdDev());
-   
+
    Add("tema",   new Tema());
 
    Add("vidya",   new Vidya());
 
   };
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void IndicatorsMap::AddVolumeIndicators()
+  {
+   Add("ad", new AD());
+   Add("mfi", new MFI());
+   Add("obv", new OBV());
+   Add("volumes", new Volumes());
+  };
 //+------------------------------------------------------------------+
