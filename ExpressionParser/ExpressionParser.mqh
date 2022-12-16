@@ -100,8 +100,7 @@ bool ExpressionParser::HasError(void)
   {
    for(int i=0; i<expressions.Total(); i++)
      {
-      Expression *expr= expressions.At(i);
-      if(expr.HasError())
+      if(((Expression*) expressions.At(i)).HasError())
          return true;
      }
    return false;
