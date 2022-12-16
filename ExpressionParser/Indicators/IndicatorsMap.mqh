@@ -27,6 +27,13 @@
 #include "Volumes/OBV.mqh"
 #include "Volumes/Volumes.mqh"
 
+#include "BillWilliams/AC.mqh"
+#include "BillWilliams/Alligator.mqh"
+#include "BillWilliams/AlligatorOscilator.mqh"
+#include "BillWilliams/AO.mqh"
+#include "BillWilliams/BWMFI.mqh"
+#include "BillWilliams/Fractals.mqh"
+
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -37,6 +44,8 @@ public:
                      IndicatorsMap();
    void              AddTrendIndicators();
    void              AddVolumeIndicators();
+   void              AddBillWilliamsIndicators();
+
   };
 
 //+------------------------------------------------------------------+
@@ -47,6 +56,7 @@ IndicatorsMap::IndicatorsMap(void)
    ::CHashMap<string, CallableIndicator *>();
    AddTrendIndicators();
    AddVolumeIndicators();
+   AddBillWilliamsIndicators();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -104,5 +114,26 @@ void IndicatorsMap::AddVolumeIndicators()
    Add("mfi", new MFI());
    Add("obv", new OBV());
    Add("volumes", new Volumes());
+  };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void IndicatorsMap::AddBillWilliamsIndicators()
+  {
+   Add("ac", new AD());
+
+   Add("alligator_lips", new AlligatorLips());
+   Add("alligator_teeth",new AlligatorTeeth());
+   Add("alligator_jaws", new AlligatorJaws());
+
+   Add("gator_upper", new GatorUpper());
+   Add("gator_lower",new GatorLower());
+
+   Add("ao", new AO());
+   Add("bwmfi", new BWMFI());
+
+   Add("fractals_up", new FractalsUpper());
+   Add("fractals_down",new FractalsLower());
+
   };
 //+------------------------------------------------------------------+
