@@ -7,24 +7,25 @@
 #property link      "https://github.com/ThiDiamondDev"
 #property version   "1.00"
 
+#include "Utils.mqh";
 #include "Indicators/Caller.mqh";
 
-enum TermType
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+class NumericTerm : public CallableIndicator
   {
-   TERM_UNDEFINED,
-   TERM_NUMERIC,
-   TERM_CALLABLE
+protected:
+   double            value;
+public:
+                     NumericTerm(double number): value(number) {};
+   virtual double    GetData(int index) { return value;};
+   virtual bool      InitIndicator() { return true;};
+   virtual void*     GetIndicator() { return NULL;};
+
   };
 
 
-template<typename T> int ArrayContains(T value, const T& array[])
-  {
-   int index=ArraySize(array);
-   while(--index >= 0)
-      if(array[index] == value)
-         break;
-   return index;
-  }
 //+------------------------------------------------------------------+
 //|  Term Class                                                      |
 //+------------------------------------------------------------------+
@@ -36,34 +37,23 @@ private:
    string            name;
    string            error;
    int               index;
-   TermType          type;
 
-   void              SetName(string value) {name = value;}
+   void              SetName(string value)  {name  = value;}
    void              SetError(string value) {error = value;}
-   void              SetType(TermType _type) {type = _type;}
-   void              SetIndex(int _index) {index = _index;}
+   void              SetIndex(int value)    {index = value;}
 
-   double            CallValue();
    bool              SearchName(string arrayName);
 
    bool              HasError();
-
    string            GetName() {return(name);};
    string            GetError() {return(error);};
-   bool              IsNumericValue(string value);
-   int               GetNumericValue(string value);
 
 public:
-                     Term(): name(""), type(TERM_UNDEFINED),index(-1), error("") {};
+                     Term(): name(""),index(-1), error("") {};
                      Term(string _name,Caller *_caller);
-                     ~Term();
+                    ~Term();
    double            GetValue();
-   string            GetValueString();
-   TermType          GetType()   {return(type);};
    int               GetIndex()  {return(index);};
-   bool              IsNumeric() { return(IsNumericValue(GetName()));};
-
-
   };
 
 
@@ -72,12 +62,8 @@ public:
 //+------------------------------------------------------------------+
 Term::Term(string _name,Caller *_caller): name(_name), error(""), caller(_caller)
   {
-   if(IsNumericValue(GetName()))
-      SetType(TERM_NUMERIC);
-   else
-      if(!SearchName(GetName()))
-         SetError("Error searching term name");
-
+   if(!SearchName(GetName()))
+      SetError("Error searching term name");
   }
 
 //+------------------------------------------------------------------+
@@ -95,11 +81,14 @@ Term::~Term()
 //+------------------------------------------------------------------+
 bool Term::SearchName(string termName)
   {
-   bool isValidTerm = false;
+   if(IsNumeric(termName))
+     {
+      indicator = new NumericTerm(StringToInteger(termName));
+      return true;
+     }
    if(caller.TryGetIndicator(termName,indicator))
      {
       caller.AddCalledIndicator(termName);
-      SetType(TERM_CALLABLE);
       return true;
      }
    string splitted[], indexValue;
@@ -114,12 +103,11 @@ bool Term::SearchName(string termName)
         {
          string callName = splitted[0];
          indexValue = StringSubstr(indexValue,0,bracketsCloseIndex);
-         isValidTerm = caller.IsValidIndicator(callName);
-         if(IsNumericValue(indexValue) && isValidTerm)
+         bool isValidTerm = caller.IsValidIndicator(callName);
+         if(IsNumeric(indexValue) && isValidTerm)
            {
             SetName(callName);
-            SetIndex(GetNumericValue(indexValue));
-            SetType(TERM_CALLABLE);
+            SetIndex((int)StringToInteger(indexValue));
             caller.AddCalledIndicator(callName);
             return caller.TryGetIndicator(callName,indicator);
            }
@@ -127,31 +115,6 @@ bool Term::SearchName(string termName)
      }
    return(false);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-bool Term::IsNumericValue(string value)
-  {
-   for(int i=0; i<StringLen(value); i++)
-     {
-      int currentChar = StringGetCharacter(value, i);
-      if(currentChar < '0' || currentChar > '9')
-         return(false);
-     }
-   return(true);
-  }
-
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-int Term::GetNumericValue(string value)
-  {
-   return((int)StringToInteger(value));
-  }
-
-
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -165,39 +128,6 @@ bool Term::HasError(void)
 //+------------------------------------------------------------------+
 double Term::GetValue(void)
   {
-   switch(GetType())
-     {
-      case TERM_NUMERIC:
-         return(GetNumericValue(GetName()));
-      case TERM_CALLABLE:
-         return(CallValue()) ;
-
-     }
-
-   SetError("Term not found");
-   return(0);
-  }
-
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-string Term::GetValueString(void)
-  {
-   if(HasError())
-      return(error);
-   if(GetType() == TERM_NUMERIC)
-      return DoubleToString(GetValue(), 0);
-   return DoubleToString(GetValue());
-  }
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-double Term::CallValue(void)
-  {
    return indicator.GetData(GetIndex());
   }
-
-
 //+------------------------------------------------------------------+
