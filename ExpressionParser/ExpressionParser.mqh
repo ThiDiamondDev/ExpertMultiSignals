@@ -88,8 +88,7 @@ bool ExpressionParser::Resolve(void)
   {
    for(int i=0; i<expressions.Total(); i++)
      {
-      Expression *expr= expressions.At(i);
-      if(!expr.Resolve())
+      if(!((Expression*) expressions.At(i)).Resolve())
          return false;
      }
    return true;
