@@ -34,7 +34,7 @@
 #include "BillWilliams/BWMFI.mqh"
 #include "BillWilliams/Fractals.mqh"
 
-
+#include "CustomIndicator.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -45,6 +45,7 @@ public:
    void              AddTrendIndicators();
    void              AddVolumeIndicators();
    void              AddBillWilliamsIndicators();
+   void              AddCustomIndicators();
 
   };
 
@@ -57,6 +58,7 @@ IndicatorsMap::IndicatorsMap(void)
    AddTrendIndicators();
    AddVolumeIndicators();
    AddBillWilliamsIndicators();
+   AddCustomIndicators();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -136,4 +138,25 @@ void IndicatorsMap::AddBillWilliamsIndicators()
    Add("fractals_down",new FractalsLower());
 
   };
-//+------------------------------------------------------------------+
+ void IndicatorsMap::AddCustomIndicators(){
+   Add("custom1a", new Custom1A());
+   Add("custom1b", new Custom1B());
+   Add("custom1c", new Custom1C());
+   Add("custom1d", new Custom1D());
+   
+   Add("custom2a", new Custom2A());
+   Add("custom2b", new Custom2B());
+   Add("custom2c", new Custom2C());
+   Add("custom2d", new Custom2D());
+
+   Add("custom3a", new Custom3A());
+   Add("custom3b", new Custom3B());
+   Add("custom3c", new Custom3C());
+   Add("custom3d", new Custom3D());
+
+   Add("custom4a", new Custom4A());
+   Add("custom4b", new Custom4B());
+   Add("custom4c", new Custom4C());
+   Add("custom4d", new Custom4D());
+
+ }
