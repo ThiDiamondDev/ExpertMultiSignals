@@ -21,8 +21,8 @@ bool  EveryTick = false;                      //
 int          ThresholdOpen  = 10;            // Signal threshold value to open [0...100]
 int          ThresholdClose = 10;            // Signal threshold value to close [0...100]
 input double PriceLevel     = 0.0;            // Price level to execute a deal
-input double StopLevel      = 50.0;           // Stop Loss level (in points)
-input double TakeLevel      = 50.0;           // Take Profit level (in points)
+input double StopLevel      = 300;           // Stop Loss level (in points)
+input double TakeLevel      = 300;           // Take Profit level (in points)
 input int    Expiration     = 4;              // Expiration of pending orders (in bars)
 input double Weight         = 1.0;            // ExpressionSignals Weight [0...1.0]
 //+------------------------------------------------------------------+
@@ -70,8 +70,14 @@ int OnInit()
    signal.ThresholdOpen(ThresholdOpen);
    signal.ThresholdClose(ThresholdClose);
    signal.PriceLevel(PriceLevel);
-   signal.StopLevel(StopLevel);
-   signal.TakeLevel(TakeLevel);
+
+   int k = 1;
+   if(Digits() % 2 == 1)
+      k = 10;
+
+   signal.StopLevel(StopLevel / k);
+   signal.TakeLevel(TakeLevel / k);
+
    signal.Expiration(Expiration);
    signal.BuySignal(BuySignal);
    signal.SellSignal(SellSignal);
