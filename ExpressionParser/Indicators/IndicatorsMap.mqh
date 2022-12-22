@@ -34,17 +34,20 @@
 #include "BillWilliams/BWMFI.mqh"
 #include "BillWilliams/Fractals.mqh"
 
-
+#include "CustomIndicator.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 class IndicatorsMap: public CHashMap<string, CallableIndicator *>
   {
+private:
+   CustomIndicator   customIndicator;
 public:
                      IndicatorsMap();
    void              AddTrendIndicators();
    void              AddVolumeIndicators();
    void              AddBillWilliamsIndicators();
+   void              AddCustomIndicators();
 
   };
 
@@ -57,6 +60,7 @@ IndicatorsMap::IndicatorsMap(void)
    AddTrendIndicators();
    AddVolumeIndicators();
    AddBillWilliamsIndicators();
+   AddCustomIndicators();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -136,4 +140,25 @@ void IndicatorsMap::AddBillWilliamsIndicators()
    Add("fractals_down",new FractalsLower());
 
   };
-//+------------------------------------------------------------------+
+ void IndicatorsMap::AddCustomIndicators(){
+   Add("custom1a", customIndicator.CreateCustomIndicator(CUSTOM1,A));
+   Add("custom1b", customIndicator.CreateCustomIndicator(CUSTOM1,B));
+   Add("custom1c", customIndicator.CreateCustomIndicator(CUSTOM1,C));
+   Add("custom1d", customIndicator.CreateCustomIndicator(CUSTOM1,D));
+   
+   Add("custom2a", customIndicator.CreateCustomIndicator(CUSTOM2,A));
+   Add("custom2b", customIndicator.CreateCustomIndicator(CUSTOM2,B));
+   Add("custom2c", customIndicator.CreateCustomIndicator(CUSTOM2,C));
+   Add("custom2d", customIndicator.CreateCustomIndicator(CUSTOM2,D));
+
+   Add("custom3a", customIndicator.CreateCustomIndicator(CUSTOM3,A));
+   Add("custom3b", customIndicator.CreateCustomIndicator(CUSTOM3,B));
+   Add("custom3c", customIndicator.CreateCustomIndicator(CUSTOM3,C));
+   Add("custom3d", customIndicator.CreateCustomIndicator(CUSTOM3,D));
+
+   Add("custom4a", customIndicator.CreateCustomIndicator(CUSTOM4,A));
+   Add("custom4b", customIndicator.CreateCustomIndicator(CUSTOM4,B));
+   Add("custom4c", customIndicator.CreateCustomIndicator(CUSTOM4,C));
+   Add("custom4d", customIndicator.CreateCustomIndicator(CUSTOM4,D));
+
+ }
