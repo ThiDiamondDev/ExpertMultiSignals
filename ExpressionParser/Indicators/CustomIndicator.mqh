@@ -1,11 +1,10 @@
 //+------------------------------------------------------------------+
-//|                                               CustomIndicator.mqh |
+//|                                              CustomIndicator.mqh |
 //|                                                       ThiDiamond |
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
 #include <Indicators\Custom.mqh>
 #include "CallableIndicator.mqh"
-
 
 input group                "Custom Indicator 1"
 
@@ -43,30 +42,67 @@ enum CustomBuffers
   {
    A,B,C,D
   };
+
+enum CustomType
+  {
+   CUSTOM1,CUSTOM2,CUSTOM3,CUSTOM4
+  };
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 class CustomIndicator : public CallableIndicator
   {
 private:
-   CiCustom                 custom;
-   int                      buffer;
-   void                     SetBuffer(int value) {buffer = value;};
+   CiCustom                 *custom;
+   CustomBuffers             buffer;
+   string            path;
+   double            param1,param2,param3,param4;
+                     CustomIndicator(CiCustom *indicator, CustomBuffers _buffer,string _path,double p1,double p2,double p3,double p4);
 public:
+                     CustomIndicator(): custom(new CiCustom) {};
+   CustomIndicator          *CreateCustomIndicator(CustomType _type,CustomBuffers _buffer);
    virtual double           GetData(int index);
    virtual void*            GetIndicator() { return GetPointer(custom);};
-   bool                     InitCustom(int buffer,string path, double param1,double param2, double param3, double param4);
+   virtual bool             InitIndicator();
   };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+CustomIndicator *CustomIndicator::CreateCustomIndicator(CustomType _type,CustomBuffers _buffer)
+  {
+   switch(_type)
+     {
+      case  CUSTOM1:
+         return new CustomIndicator(custom,_buffer,Custom1Path,Custom1Param1,Custom1Param2, Custom1Param3, Custom1param4);
+      case  CUSTOM2:
+         return new CustomIndicator(custom,_buffer,Custom2Path,Custom2Param1,Custom2Param2, Custom2Param3, Custom2param4);
+      case  CUSTOM3:
+         return new CustomIndicator(custom,_buffer,Custom3Path,Custom3Param1,Custom3Param2, Custom3Param3, Custom3param4);
+      case  CUSTOM4:
+         return new CustomIndicator(custom,_buffer,Custom4Path,Custom4Param1,Custom4Param2, Custom4Param3, Custom4param4);
+     }
+   return NULL;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+CustomIndicator::
+CustomIndicator(CiCustom *indicator, CustomBuffers _buffer,string _path,double p1,double p2,double p3,double p4):
+   custom(indicator),buffer(_buffer), path(_path), param1(p1),param2(p2),param3(p3),param4(p4)
+  {
+  }
+
 //+------------------------------------------------------------------+
 //| Create Custom indicators                                             |
 //+------------------------------------------------------------------+
-bool CustomIndicator::InitCustom(int _buffer,string path, double param1,double param2, double param3, double param4)
+bool CustomIndicator::InitIndicator()
   {
-   if(_buffer > 3)
+   if(custom.Handle() != INVALID_HANDLE)
+      return true;
+   if(buffer > 3)
       return false;
 
-   SetBuffer(_buffer);
-   MqlParam params[4];
+   MqlParam params[5];
    params[0].type          = TYPE_STRING;
    params[0].string_value  = path;
    params[1].type          = TYPE_DOUBLE;
@@ -77,6 +113,7 @@ bool CustomIndicator::InitCustom(int _buffer,string path, double param1,double p
    params[3].double_value  = param3;
    params[4].type          = TYPE_DOUBLE;
    params[4].double_value  = param4;
+
 // initialize object
    if(!custom.Create(Symbol(),Period(),IND_CUSTOM,ArraySize(params),params))
      {
@@ -86,7 +123,6 @@ bool CustomIndicator::InitCustom(int _buffer,string path, double param1,double p
 
    return(true);
   }
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -94,184 +130,4 @@ double CustomIndicator::GetData(int index)
   {
    return custom.GetData(buffer, index);
   }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom1A: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(A,Custom1Path,Custom1Param1,Custom1Param2, Custom1Param3, Custom1param4);
-     };
-  };
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom1B: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(B,Custom1Path,Custom1Param1,Custom1Param2, Custom1Param3, Custom1param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom1C: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(C,Custom1Path,Custom1Param1,Custom1Param2, Custom1Param3, Custom1param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom1D: public CustomIndicator
-  {
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(D,Custom1Path,Custom1Param1,Custom1Param2, Custom1Param3, Custom1param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom2A: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(A,Custom2Path,Custom2Param1,Custom2Param2, Custom2Param3, Custom2param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom2B: public CustomIndicator
-  {
-public:
-
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(B,Custom2Path,Custom2Param1,Custom2Param2, Custom2Param3, Custom2param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom2C: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(C,Custom2Path,Custom2Param1,Custom2Param2, Custom2Param3, Custom2param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom2D: public CustomIndicator
-  {
-public:
-
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(D,Custom2Path,Custom2Param1,Custom2Param2, Custom2Param3, Custom2param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom3A: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(A,Custom3Path,Custom3Param1,Custom3Param2, Custom3Param3, Custom3param4);
-     };
-  };
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom3B: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(B,Custom3Path,Custom3Param1,Custom3Param2, Custom3Param3, Custom3param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom3C: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(C,Custom3Path,Custom3Param1,Custom3Param2, Custom3Param3, Custom3param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom3D: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(D,Custom3Path,Custom3Param1,Custom3Param2, Custom3Param3, Custom3param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom4A: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(A,Custom4Path,Custom4Param1,Custom4Param2, Custom4Param3, Custom4param4);
-     };
-  };
-
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom4B: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(B,Custom4Path,Custom4Param1,Custom4Param2, Custom4Param3, Custom4param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom4C: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(C,Custom4Path,Custom4Param1,Custom4Param2, Custom4Param3, Custom4param4);
-     };
-  };
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-class Custom4D: public CustomIndicator
-  {
-public:
-   virtual bool      InitIndicator()
-     {
-      return InitCustom(D,Custom4Path,Custom4Param1,Custom4Param2, Custom4Param3, Custom4param4);
-     };
-  };
 //+------------------------------------------------------------------+
