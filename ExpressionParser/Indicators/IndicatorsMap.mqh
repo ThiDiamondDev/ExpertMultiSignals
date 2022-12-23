@@ -35,6 +35,7 @@
 #include "BillWilliams/Fractals.mqh"
 
 #include "CustomIndicator.mqh"
+#include "Timeseries.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -48,7 +49,7 @@ public:
    void              AddVolumeIndicators();
    void              AddBillWilliamsIndicators();
    void              AddCustomIndicators();
-
+   void              AddTimeseriesIndicators();
   };
 
 //+------------------------------------------------------------------+
@@ -160,5 +161,18 @@ void IndicatorsMap::AddBillWilliamsIndicators()
    Add("custom4b", customIndicator.CreateCustomIndicator(CUSTOM4,B));
    Add("custom4c", customIndicator.CreateCustomIndicator(CUSTOM4,C));
    Add("custom4d", customIndicator.CreateCustomIndicator(CUSTOM4,D));
-
  }
+ //+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void IndicatorsMap::AddTimeseriesIndicators()
+  {
+   Add("open" ,new Open());
+   Add("high" ,new High());
+   Add("low"  ,new Low());
+   Add("close",new Close());
+
+   Add("ask", new Ask());
+   Add("bid", new Bid());
+   Add("last",new Last());
+};
