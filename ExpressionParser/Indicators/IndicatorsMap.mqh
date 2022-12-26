@@ -35,6 +35,7 @@
 #include "BillWilliams/Fractals.mqh"
 
 #include "CustomIndicator.mqh"
+#include "Timeseries.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -48,7 +49,7 @@ public:
    void              AddVolumeIndicators();
    void              AddBillWilliamsIndicators();
    void              AddCustomIndicators();
-
+   void              AddTimeseriesIndicators();
   };
 
 //+------------------------------------------------------------------+
@@ -61,6 +62,7 @@ IndicatorsMap::IndicatorsMap(void)
    AddVolumeIndicators();
    AddBillWilliamsIndicators();
    AddCustomIndicators();
+   AddTimeseriesIndicators();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -140,12 +142,16 @@ void IndicatorsMap::AddBillWilliamsIndicators()
    Add("fractals_down",new FractalsLower());
 
   };
- void IndicatorsMap::AddCustomIndicators(){
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void IndicatorsMap::AddCustomIndicators()
+  {
    Add("custom1a", customIndicator.CreateCustomIndicator(CUSTOM1,A));
    Add("custom1b", customIndicator.CreateCustomIndicator(CUSTOM1,B));
    Add("custom1c", customIndicator.CreateCustomIndicator(CUSTOM1,C));
    Add("custom1d", customIndicator.CreateCustomIndicator(CUSTOM1,D));
-   
+
    Add("custom2a", customIndicator.CreateCustomIndicator(CUSTOM2,A));
    Add("custom2b", customIndicator.CreateCustomIndicator(CUSTOM2,B));
    Add("custom2c", customIndicator.CreateCustomIndicator(CUSTOM2,C));
@@ -160,5 +166,19 @@ void IndicatorsMap::AddBillWilliamsIndicators()
    Add("custom4b", customIndicator.CreateCustomIndicator(CUSTOM4,B));
    Add("custom4c", customIndicator.CreateCustomIndicator(CUSTOM4,C));
    Add("custom4d", customIndicator.CreateCustomIndicator(CUSTOM4,D));
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void IndicatorsMap::AddTimeseriesIndicators()
+  {
+   Add("open",new Open());
+   Add("high",new High());
+   Add("low",new Low());
+   Add("close",new Close());
 
- }
+   Add("ask", new Ask());
+   Add("bid", new Bid());
+   Add("last",new Last());
+  };
+//+------------------------------------------------------------------+
