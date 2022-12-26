@@ -45,8 +45,6 @@ private:
    bool              SearchName(string arrayName);
 
    bool              HasError();
-   string            GetName() {return(name);};
-   string            GetError() {return(error);};
 
 public:
                      Term(): name(""),index(-1), error("") {};
@@ -54,6 +52,9 @@ public:
                     ~Term();
    double            GetValue();
    int               GetIndex()  {return(index);};
+   string            GetName() {return(name);};
+   string            GetError() {return(error);};
+
   };
 
 
@@ -63,7 +64,7 @@ public:
 Term::Term(string _name,Caller *_caller): name(_name), error(""), caller(_caller)
   {
    if(!SearchName(GetName()))
-      SetError("Error searching term name");
+      SetError("Error searching term name: " + name);
   }
 
 //+------------------------------------------------------------------+
