@@ -3,7 +3,7 @@
 //|                                                       ThiDiamond |
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
-#include <Indicators\Trend.mqh>
+#include <Indicators\Oscilators.mqh>
 #include "../CallableIndicator.mqh"
 
 input group "ATR"
