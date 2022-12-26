@@ -79,6 +79,18 @@ bool Expression::Resolve(void)
 //+------------------------------------------------------------------+
 bool Expression::HasError(void)
   {
-   return(error != "");
+   bool hasError = false;
+   if(termA.GetError() != "")
+     {
+      Print(termA.GetError());
+      hasError = true;
+     }
+   if(termB.GetError() != "")
+     {
+      Print(termB.GetError());
+      hasError = true;
+     }
+
+   return hasError;
   }
 //+------------------------------------------------------------------+
