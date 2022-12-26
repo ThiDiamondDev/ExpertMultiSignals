@@ -88,10 +88,7 @@ bool Term::SearchName(string termName)
       return true;
      }
    if(caller.TryGetIndicator(termName,indicator))
-     {
-      caller.AddCalledIndicator(termName);
       return true;
-     }
    string splitted[], indexValue;
    int bracketsCloseIndex;
    StringSplit(termName,'[',splitted);
