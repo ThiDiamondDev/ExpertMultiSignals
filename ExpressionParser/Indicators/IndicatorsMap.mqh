@@ -36,6 +36,23 @@
 
 #include "CustomIndicator.mqh"
 #include "Timeseries.mqh"
+
+#include "Oscilators/ATR.mqh"
+#include "Oscilators/ATR.mqh"
+#include "Oscilators/BearsPower.mqh"
+#include "Oscilators/BullsPower.mqh"
+#include "Oscilators/CCI.mqh"
+#include "Oscilators/Chaikin.mqh"
+#include "Oscilators/Demarker.mqh"
+#include "Oscilators/ForceIndex.mqh"
+#include "Oscilators/MACD.mqh"
+#include "Oscilators/Momentum.mqh"
+#include "Oscilators/OsMA.mqh"
+#include "Oscilators/RSI.mqh"
+#include "Oscilators/RVI.mqh"
+#include "Oscilators/Stochastic.mqh"
+#include "Oscilators/TRIX.mqh"
+#include "Oscilators/WPR.mqh"
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -50,6 +67,7 @@ public:
    void              AddBillWilliamsIndicators();
    void              AddCustomIndicators();
    void              AddTimeseriesIndicators();
+   void              AddOscilatorsIndicators();
   };
 
 //+------------------------------------------------------------------+
@@ -63,6 +81,7 @@ IndicatorsMap::IndicatorsMap(void)
    AddBillWilliamsIndicators();
    AddCustomIndicators();
    AddTimeseriesIndicators();
+   AddOscilatorsIndicators();
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -180,5 +199,35 @@ void IndicatorsMap::AddTimeseriesIndicators()
    Add("ask", new Ask());
    Add("bid", new Bid());
    Add("last",new Last());
+  };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void IndicatorsMap::AddOscilatorsIndicators()
+  {
+   Add("atr", new ATR());
+   Add("bears", new BearsPower());
+   Add("bulls", new BullsPower());
+   Add("cci", new CCI());
+   Add("chaikin", new Chaikin());
+
+   Add("demarker", new Demarker());
+   Add("force", new ForceIndex());
+
+   Add("macd",new MACD());
+   Add("macd_signal",new MACDSignal());
+
+   Add("momentum", new Momentum);
+   Add("osma", new OsMA());
+   Add("rsi",new RSI());
+
+   Add("rvi", new RVI());
+   Add("rvi_signal", new RVISignal());
+
+   Add("stochastic",  new Stochastic());
+   Add("stochastic_signal",  new StochasticSignal());
+
+   Add("trix", new TRIX());
+   Add("wpr", new WPR());
   };
 //+------------------------------------------------------------------+
