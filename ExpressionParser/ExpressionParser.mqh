@@ -5,7 +5,7 @@
 //+------------------------------------------------------------------+
 
 #include "Expression.mqh"
-#include "Indicators\Caller.mqh";
+#include "Indicators/Caller.mqh";
 #include <Object.mqh>
 #include <Arrays\ArrayObj.mqh>
 #include <Arrays\ArrayString.mqh>
@@ -25,7 +25,7 @@ char LOGICAL_OPERATORS[] = {'&'};
 class ExpressionParser
   {
 private:
-   string            expression_str;
+   string            expression_str, error;
    CArrayObj         expressions;
    Caller            *caller;
 
@@ -45,7 +45,7 @@ public:
 //|                                                                  |
 //+------------------------------------------------------------------+
 ExpressionParser::ExpressionParser(string _expression, Caller *_caller)
-   : expression_str(_expression)
+   : expression_str(_expression), error("")
   {
    StringReplace(expression_str, " ", "");
    caller = _caller;
@@ -61,8 +61,13 @@ void ExpressionParser::SplitExpressions()
    string expression = GetExpressionStr();
 
    ReplaceOperatorsWithTokens(expression);
-
    StringSplit(expression, LOGICAL_OPERATORS[0],_expressions);
+   
+   if(ArrayContains("",_expressions) > 0)
+     {
+      error = "Invalid empty expression";
+      return;
+     }
    for(int expIdx = 0; expIdx < ArraySize(_expressions); expIdx++)
       for(int opIdx=0; opIdx < ArraySize(RELATIONAL_OPERATORS_TOKENS) ; opIdx++)
         {
@@ -72,7 +77,6 @@ void ExpressionParser::SplitExpressions()
                new  Expression(result[0], result[1], RELATIONAL_OPERATORS_STRING[opIdx],opIdx,caller));
         }
   }
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -87,21 +91,27 @@ void ExpressionParser::ReplaceOperatorsWithTokens(string &_expression)
 bool ExpressionParser::Resolve(void)
   {
    for(int i=0; i<expressions.Total(); i++)
-     {
-      if(!((Expression*) expressions.At(i)).Resolve())
-         return false;
-     }
-   return true;
+      if(((Expression*) expressions.At(i)).Resolve())
+         return true;
+
+   return false;
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 bool ExpressionParser::HasError(void)
   {
+  bool hasError = false;
    for(int i=0; i<expressions.Total(); i++)
-     {
       if(((Expression*) expressions.At(i)).HasError())
-         return true;
+         hasError = true;
+
+   if(error != "")
+     {
+      hasError = true;
+      Print(error);
      }
-   return false;
+
+   return hasError;
   }
+//+------------------------------------------------------------------+
