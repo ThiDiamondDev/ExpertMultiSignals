@@ -3,16 +3,32 @@
 //|                                                       ThiDiamond |
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
+
+
+enum OpenOrderAt
+  {
+   MARKET_PRICE,  //
+   PENDING,       //
+  };
+
+enum SellType
+  {
+   SELL_AT_PRICE,  //
+   SELL_PENDING,   //
+  };
+
 input group "Buy Signal"
-input string BuySignal         = "ma1[1] > ma2[1]";    // Buy Signal
-input string BuyReverseSignal  = "";    // Buy Reversal Signal
+input string BuySignal               = "ma1[1] > ma2[1]";    // Buy Signal
+input string BuyReverseSignal        = "";                   // Buy Reversal Signal
+input OpenOrderAt BuyAt   = MARKET_PRICE;                   // Buy Reversal Signal
 
 input group "Sell Signal"
-input string SellSignal         = "";  // Buy Signal
-input string SellReverseSignal  = "";  // Buy Signal
+input string SellSignal              = "";  // Buy Signal
+input string SellReverseSignal       = "";  // Buy Signal
+input OpenOrderAt SellAt   = MARKET_PRICE;  // Buy Reversal Signal
 
 #include <Expert\ExpertSignal.mqh>
-#include "ExpressionParser/ExpressionParser.mqh"
+#include "ExpressionParser.mqh"
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -56,10 +72,16 @@ bool ExpressionSignals::ValidationSettings(void)
    if(!CExpertSignal::ValidationSettings())
       return false;
 
-   if(buyParser.HasError())
+   if(!buyParser.Init())
       return false;
 
-   if(sellParser.HasError())
+   if(!sellParser.Init())
+      return false;
+
+   if(!buyReverseParser.Init())
+      return false;
+
+   if(!sellReverseParser.Init())
       return false;
 
    return true;
@@ -84,9 +106,11 @@ bool ExpressionSignals::InitIndicators(CIndicators *indicators)
 //+------------------------------------------------------------------+
 bool ExpressionSignals::CheckOpenLong(double &price,double &sl,double &tp,datetime &expiration)
   {
-   if(buyParser.Resolve())
-      return OpenLongParams(price,sl,tp,expiration);
-
+   if(buyParser.SolveExpression() == 1)
+     {
+      if(BuyAt == MARKET_PRICE)
+         return OpenLongParams(price,sl,tp,expiration);
+     }
    return false;
   }
 
@@ -95,7 +119,7 @@ bool ExpressionSignals::CheckOpenLong(double &price,double &sl,double &tp,dateti
 //+------------------------------------------------------------------+
 bool ExpressionSignals::CheckOpenShort(double &price,double &sl,double &tp,datetime &expiration)
   {
-   if(sellParser.Resolve())
+   if(sellParser.SolveExpression() == 1)
       return OpenShortParams(price,sl,tp,expiration);
 
    return false;
@@ -106,7 +130,7 @@ bool ExpressionSignals::CheckOpenShort(double &price,double &sl,double &tp,datet
 //+------------------------------------------------------------------+
 bool ExpressionSignals::CheckReverseLong(double &price,double &sl,double &tp,datetime &expiration)
   {
-   if(buyReverseParser.Resolve())
+   if(buyReverseParser.SolveExpression() == 1)
       return OpenLongParams(price,sl,tp,expiration);
 
    return false;
@@ -116,7 +140,7 @@ bool ExpressionSignals::CheckReverseLong(double &price,double &sl,double &tp,dat
 //+------------------------------------------------------------------+
 bool ExpressionSignals::CheckReverseShort(double &price,double &sl,double &tp,datetime &expiration)
   {
-   if(sellReverseParser.Resolve())
+   if(sellReverseParser.SolveExpression() == 1)
       return OpenShortParams(price,sl,tp,expiration);
 
    return false;
