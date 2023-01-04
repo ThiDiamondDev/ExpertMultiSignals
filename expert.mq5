@@ -7,34 +7,26 @@
 #property link "https://github.com/ThiDiamondDev"
 #property version "1.00"
 
-//+------------------------------------------------------------------+
-//| Inputs                                                           |
-//+------------------------------------------------------------------+
-//--- inputs for expert
-input string Title      = "expert";             // Document name
-input string BuySignal  = "ma1[1] > ma2[1]";  // Buy Signal
-input string SellSignal = "ma1[1] < ma2[1]";  // Sell Signal
+input group "Expert"
 
-ulong MagicNumber = 25401;                    //
-bool  EveryTick = false;                      //
+input string Title      = "expert";            // Document name
+input ulong MagicNumber =     1;               // Magic Number
+bool  EveryTick = false;                       // Every Tick
 //--- inputs for main signal
-int          ThresholdOpen  = 10;            // Signal threshold value to open [0...100]
-int          ThresholdClose = 10;            // Signal threshold value to close [0...100]
-input double PriceLevel     = 0.0;            // Price level to execute a deal
-input double StopLevel      = 300;           // Stop Loss level (in points)
-input double TakeLevel      = 300;           // Take Profit level (in points)
-input int    Expiration     = 4;              // Expiration of pending orders (in bars)
-input double Weight         = 1.0;            // ExpressionSignals Weight [0...1.0]
-//+------------------------------------------------------------------+
-//| Include                                                          |
-//+------------------------------------------------------------------+
-#include <Expert\Expert.mqh>
-//--- available signals
+input group "Order Settings"
+
+input double PriceLevel     = 0.0;             // Price level to execute a deal
+input double StopLevel      = 300;             // Stop Loss level (in points)
+input double TakeLevel      = 300;             // Take Profit level (in points)
+input int    Expiration     = 4;               // Expiration of pending orders (in bars)
+
+
 #include "ExpressionSignals.mqh"
-//--- available trailing
+#include <Expert\Expert.mqh>
 #include <Expert\Trailing\TrailingNone.mqh>
-//--- available money management
 #include <Expert\Money\MoneyNone.mqh>
+
+
 //+------------------------------------------------------------------+
 //| Global expert object                                             |
 //+------------------------------------------------------------------+
@@ -67,20 +59,15 @@ int OnInit()
      }
 //---
    ExtExpert.InitSignal(signal);
-   signal.ThresholdOpen(ThresholdOpen);
-   signal.ThresholdClose(ThresholdClose);
-   signal.PriceLevel(PriceLevel);
 
    int k = 1;
    if(Digits() % 2 == 1)
       k = 10;
 
+   signal.PriceLevel(PriceLevel / k);
    signal.StopLevel(StopLevel / k);
    signal.TakeLevel(TakeLevel / k);
-
    signal.Expiration(Expiration);
-   signal.BuySignal(BuySignal);
-   signal.SellSignal(SellSignal);
 
 //--- Creation of trailing object
    CTrailingNone *trailing = new CTrailingNone;
@@ -164,5 +151,4 @@ void OnTimer()
   {
    ExtExpert.OnTimer();
   }
-//+------------------------------------------------------------------+
 //+------------------------------------------------------------------+

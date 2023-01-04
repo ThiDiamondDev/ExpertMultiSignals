@@ -9,12 +9,15 @@
 #include <Indicators/Indicators.mqh>
 
 
-interface CallableIndicator
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+class CallableIndicator: public CObject
   {
 public:
 
-   virtual bool              InitIndicator();
-   virtual double            GetData(int index);
-   virtual void*             GetIndicator();
+   virtual bool              InitIndicator() {return false;};
+   virtual double            GetData(int index) {return 0;};
+   virtual void*             GetIndicator() {return NULL;};
   };
 //+------------------------------------------------------------------+

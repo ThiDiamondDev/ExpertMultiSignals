@@ -60,6 +60,7 @@ class IndicatorsMap: public CHashMap<string, CallableIndicator *>
   {
 private:
    CustomIndicator   customIndicator;
+   string            keys[];
 public:
                      IndicatorsMap();
    void              AddTrendIndicators();
@@ -68,8 +69,9 @@ public:
    void              AddCustomIndicators();
    void              AddTimeseriesIndicators();
    void              AddOscilatorsIndicators();
+   bool              Add(string key,CallableIndicator *value);
+   void              CopyKeys(string &array[]);
   };
-
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -82,6 +84,28 @@ IndicatorsMap::IndicatorsMap(void)
    AddCustomIndicators();
    AddTimeseriesIndicators();
    AddOscilatorsIndicators();
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool IndicatorsMap::Add(string key,CallableIndicator *value)
+  {
+   if(CHashMap<string, CallableIndicator*>::Add(key, value))
+     {
+     int newSize = ArraySize(keys);
+      ArrayResize(keys,ArraySize(keys) + 1);
+      keys[newSize] = key;
+      return true;
+     }
+   return false;
+  }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void IndicatorsMap::CopyKeys(string &array[])
+  {
+   ArrayCopy(array,keys);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |

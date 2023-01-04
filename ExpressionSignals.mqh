@@ -3,25 +3,33 @@
 //|                                                       ThiDiamond |
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
+
+
+enum OpenOrderAt
+  {
+   MARKET_PRICE,  //
+   PENDING,       //
+  };
+
+enum SellType
+  {
+   SELL_AT_PRICE,  //
+   SELL_PENDING,   //
+  };
+
+input group "Buy Signal"
+input string BuySignal               = "ma1[1] > ma2[1]";    // Buy Signal
+input string BuyReverseSignal        = "";                   // Buy Reversal Signal
+input OpenOrderAt BuyAt   = MARKET_PRICE;                   // Buy Reversal Signal
+
+input group "Sell Signal"
+input string SellSignal              = "";  // Buy Signal
+input string SellReverseSignal       = "";  // Buy Signal
+input OpenOrderAt SellAt   = MARKET_PRICE;  // Buy Reversal Signal
+
 #include <Expert\ExpertSignal.mqh>
-#include "ExpressionParser/ExpressionParser.mqh"
-// wizard description start
-//+------------------------------------------------------------------+
-//| Description of the class                                         |
-//| Title=ExpressionSignals                                          |
-//| Type=SignalAdvanced                                              |
-//| Name=ExpressionSignals                                           |
-//| ShortName=ExpressionSignals                                      |
-//| Class=ExpressionSignals                                          |
-//| Page=https://github.com/ThiDiamondDev/ExpertMultiSignals         |
-//| Parameter=BuySignal,string,ma1[1] > ma2[1],Buy Signal            |
-//| Parameter=SellSignal,string,ma1[1] < ma2[1],Sell Signal          |
-//+------------------------------------------------------------------+
-// wizard description end
-//+------------------------------------------------------------------+
-//| Class ExpressionSignals.                                         |
-//| Purpose: MultiSIgnals                                            |
-//+------------------------------------------------------------------+
+#include "ExpressionParser.mqh"
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -30,25 +38,32 @@ class ExpressionSignals : public CExpertSignal
 
 protected:
    Caller            caller;
-   int               m_pattern_0;
-   ExpressionParser  buyParser,sellParser;
+   ExpressionParser  buyParser,buyReverseParser,sellParser,sellReverseParser;
+   double            m_limit;
 public:
-                     ExpressionSignals(void) : m_pattern_0(100) {};
-   void              Pattern_0(int value) { m_pattern_0 = value; }
-   void              SellSignal(string value);
-   void              BuySignal(string value);
-
+                     ExpressionSignals(void);
    // verification of settings
    virtual bool      ValidationSettings(void);
 
    // creating the indicator and timeseries
    virtual bool      InitIndicators(CIndicators *indicators);
 
-   // checking if the market models are formed
-   virtual int       LongCondition(void);
-   virtual int       ShortCondition(void);
-
+   virtual bool      CheckOpenShort(double& price,double& sl,double& tp,datetime& expiration);
+   virtual bool      CheckOpenLong(double& price,double& sl,double& tp,datetime& expiration);
+   virtual bool      CheckReverseShort(double& price,double& sl,double& tp,datetime& expiration);
+   virtual bool      CheckReverseLong(double& price,double& sl,double& tp,datetime& expiration);
   };
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+ExpressionSignals::ExpressionSignals():
+   buyParser(BuySignal,GetPointer(caller)),
+   buyReverseParser(BuyReverseSignal,GetPointer(caller)),
+   sellParser(SellSignal,GetPointer(caller)),
+   sellReverseParser(SellReverseSignal,GetPointer(caller))
+  {
+
+  }
 //+------------------------------------------------------------------+
 //| Validation settings protected data                               |
 //+------------------------------------------------------------------+
@@ -57,29 +72,21 @@ bool ExpressionSignals::ValidationSettings(void)
    if(!CExpertSignal::ValidationSettings())
       return false;
 
-   if(buyParser.HasError())
+   if(!buyParser.Init())
       return false;
 
-   if(sellParser.HasError())
+   if(!sellParser.Init())
+      return false;
+
+   if(!buyReverseParser.Init())
+      return false;
+
+   if(!sellReverseParser.Init())
       return false;
 
    return true;
   }
 
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void ExpressionSignals::BuySignal(string signal)
-  {
-   buyParser = new ExpressionParser(signal,GetPointer(caller));
-  }
-//+------------------------------------------------------------------+
-//|                                                                  |
-//+------------------------------------------------------------------+
-void ExpressionSignals::SellSignal(string signal)
-  {
-   sellParser = new ExpressionParser(signal,GetPointer(caller));
-  }
 //+------------------------------------------------------------------+
 //| Create indicators                                                |
 //+------------------------------------------------------------------+
@@ -95,23 +102,47 @@ bool ExpressionSignals::InitIndicators(CIndicators *indicators)
    return true;
   }
 //+------------------------------------------------------------------+
-//| "Voting" that price will grow                                    |
+//|                                                                  |
 //+------------------------------------------------------------------+
-int ExpressionSignals::LongCondition(void)
+bool ExpressionSignals::CheckOpenLong(double &price,double &sl,double &tp,datetime &expiration)
   {
-   if(buyParser.Resolve())
-      return m_pattern_0;
-   return 0;
+   if(buyParser.SolveExpression() == 1)
+     {
+      if(BuyAt == MARKET_PRICE)
+         return OpenLongParams(price,sl,tp,expiration);
+     }
+   return false;
   }
 
 //+------------------------------------------------------------------+
-//| "Voting" that price will fall                                    |
+//|                                                                  |
 //+------------------------------------------------------------------+
-int ExpressionSignals::ShortCondition(void)
+bool ExpressionSignals::CheckOpenShort(double &price,double &sl,double &tp,datetime &expiration)
   {
-   if(sellParser.Resolve())
-      return m_pattern_0;
+   if(sellParser.SolveExpression() == 1)
+      return OpenShortParams(price,sl,tp,expiration);
 
-   return 0;
+   return false;
+  }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool ExpressionSignals::CheckReverseLong(double &price,double &sl,double &tp,datetime &expiration)
+  {
+   if(buyReverseParser.SolveExpression() == 1)
+      return OpenLongParams(price,sl,tp,expiration);
+
+   return false;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool ExpressionSignals::CheckReverseShort(double &price,double &sl,double &tp,datetime &expiration)
+  {
+   if(sellReverseParser.SolveExpression() == 1)
+      return OpenShortParams(price,sl,tp,expiration);
+
+   return false;
   }
 //+------------------------------------------------------------------+
