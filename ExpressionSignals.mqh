@@ -3,29 +3,54 @@
 //|                                                       ThiDiamond |
 //|                                 https://github.com/ThiDiamondDev |
 //+------------------------------------------------------------------+
-
-
-enum OpenOrderAt
+enum OrderType
   {
    MARKET_PRICE,  //
    PENDING,       //
   };
-
-enum SellType
+enum TPSLType
   {
-   SELL_AT_PRICE,  //
-   SELL_PENDING,   //
+   FIXED,  //
+   SIGNAL, //
   };
 
 input group "Buy Signal"
-input string BuySignal               = "ma1[1] > ma2[1]";    // Buy Signal
-input string BuyReverseSignal        = "";                   // Buy Reversal Signal
-input OpenOrderAt BuyAt   = MARKET_PRICE;                   // Buy Reversal Signal
+
+input string BuySignal               = "ma1[2] < ma2[1] && ma1[1] > ma2[1]"; // Buy Signal
+input string BuyReverseSignal        = "";                                  // Buy Reversal Signal
+input OrderType BuyAt                = MARKET_PRICE;
+input string BuyPendingSignal        = "";
+
+input group "Buy Take Profit"
+
+input TPSLType BuyTPType             = FIXED;                //Type of TP to use
+input double    BuyFixedTakeProfit   = 300;                  //Fixed value
+input string BuyTakeSignal           = "envelopes_upper[1]"; //Expression calculation
+
+input group "Buy Stop Loss"
+
+input TPSLType BuySLType           = FIXED;               //Type of SL to use
+input double    BuyFixedStopLoss   = 300;                 //Fixed value
+input string    BuyStopSignal      = "envelopes_lower[1]";//Expression calculation
 
 input group "Sell Signal"
-input string SellSignal              = "";  // Buy Signal
-input string SellReverseSignal       = "";  // Buy Signal
-input OpenOrderAt SellAt   = MARKET_PRICE;  // Buy Reversal Signal
+
+input string    SellSignal         = "";     // Sell Signal
+input string    SellReverseSignal  = "";     // Sell Reversal Signal
+input OrderType SellAt             = MARKET_PRICE;
+input string    SellPendingSignal  = "";
+
+input group "Sell Take Profit"
+
+input TPSLType SellTPType          = FIXED; //Type of TP to use
+input double   SellFixedTakeProfit = 0;     //Fixed value
+input string   SellTakeSignal      = "";    //Expression calculation
+
+input group "Sell Stop Loss"
+
+input TPSLType SellSLType           = FIXED;//Type of SL to use
+input double   SellFixedStopLoss    = 0;    //Fixed value
+input string   SellStopSignal       = "";   //Expression calculation
 
 #include <Expert\ExpertSignal.mqh>
 #include "ExpressionParser.mqh"
@@ -38,8 +63,14 @@ class ExpressionSignals : public CExpertSignal
 
 protected:
    Caller            caller;
-   ExpressionParser  buyParser,buyReverseParser,sellParser,sellReverseParser;
-   double            m_limit;
+   ExpressionParser  buyParser,buyReverseParser,buyPendingParser,buyTakeParser, buyStopParser;
+   ExpressionParser  sellParser,sellReverseParser,sellPendingParser,sellTakeParser,sellStopParser;
+
+   int               k;
+
+   double            GetLongPrice();
+   double            GetShortPrice();
+
 public:
                      ExpressionSignals(void);
    // verification of settings
@@ -47,6 +78,9 @@ public:
 
    // creating the indicator and timeseries
    virtual bool      InitIndicators(CIndicators *indicators);
+
+   virtual bool      OpenLongParams(double& price,double& sl,double& tp,datetime& expiration);
+   virtual bool      OpenShortParams(double& price,double& sl,double& tp,datetime& expiration);
 
    virtual bool      CheckOpenShort(double& price,double& sl,double& tp,datetime& expiration);
    virtual bool      CheckOpenLong(double& price,double& sl,double& tp,datetime& expiration);
@@ -59,10 +93,20 @@ public:
 ExpressionSignals::ExpressionSignals():
    buyParser(BuySignal,GetPointer(caller)),
    buyReverseParser(BuyReverseSignal,GetPointer(caller)),
-   sellParser(SellSignal,GetPointer(caller)),
-   sellReverseParser(SellReverseSignal,GetPointer(caller))
-  {
+   buyPendingParser(BuyPendingSignal,GetPointer(caller)),
+   buyTakeParser(BuyTakeSignal,GetPointer(caller)),
+   buyStopParser(BuyStopSignal,GetPointer(caller)),
 
+   sellParser(SellSignal,GetPointer(caller)),
+   sellReverseParser(SellReverseSignal,GetPointer(caller)),
+   sellPendingParser(SellPendingSignal, GetPointer(caller)),
+   sellTakeParser(SellTakeSignal,GetPointer(caller)),
+   sellStopParser(SellStopSignal,GetPointer(caller))
+  {
+   if(Digits() % 2 == 1)
+      k = 10;
+   else
+      k = 1;
   }
 //+------------------------------------------------------------------+
 //| Validation settings protected data                               |
@@ -84,6 +128,31 @@ bool ExpressionSignals::ValidationSettings(void)
    if(!sellReverseParser.Init())
       return false;
 
+   if(BuyTPType == SIGNAL)
+      if(!buyTakeParser.Init())
+         return false;
+
+   if(BuySLType == SIGNAL)
+      if(!buyStopParser.Init())
+         return false;
+
+   if(SellTPType == SIGNAL)
+      if(!sellTakeParser.Init())
+         return false;
+
+
+   if(SellSLType == SIGNAL)
+      if(!sellStopParser.Init())
+         return false;
+
+   if(BuyAt == PENDING)
+      if(!buyPendingParser.Init())
+         return false;
+
+   if(SellAt == PENDING)
+      if(!sellPendingParser.Init())
+         return false;
+
    return true;
   }
 
@@ -101,16 +170,58 @@ bool ExpressionSignals::InitIndicators(CIndicators *indicators)
       return false;
    return true;
   }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool ExpressionSignals::OpenLongParams(double &price,double &sl,double &tp,datetime &expiration)
+  {
+   price = GetLongPrice();
+
+   if(BuyTPType == FIXED)
+      tp = m_symbol.NormalizePrice(price+(BuyFixedTakeProfit / k)*PriceLevelUnit());
+   else
+      tp = m_symbol.NormalizePrice(buyTakeParser.SolveExpression());
+
+   if(BuySLType == FIXED)
+      sl = m_symbol.NormalizePrice(price-(BuyFixedStopLoss / k)*PriceLevelUnit());
+   else
+      sl = m_symbol.NormalizePrice(buyStopParser.SolveExpression());
+
+   expiration+=m_expiration*PeriodSeconds(m_period);
+   return(true);
+
+  }
+
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool ExpressionSignals::OpenShortParams(double &price,double &sl,double &tp,datetime &expiration)
+  {
+   price = GetShortPrice();
+
+   if(SellTPType == FIXED)
+      tp = m_symbol.NormalizePrice(price-(SellFixedTakeProfit / k)*PriceLevelUnit());
+   else
+      tp = m_symbol.NormalizePrice(sellTakeParser.SolveExpression());
+
+   if(SellSLType == FIXED)
+      sl = m_symbol.NormalizePrice(price+(SellFixedStopLoss / k)*PriceLevelUnit());
+   else
+      sl = m_symbol.NormalizePrice(sellStopParser.SolveExpression());
+
+   expiration+=m_expiration*PeriodSeconds(m_period);
+   return true;
+
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
 bool ExpressionSignals::CheckOpenLong(double &price,double &sl,double &tp,datetime &expiration)
   {
    if(buyParser.SolveExpression() == 1)
-     {
-      if(BuyAt == MARKET_PRICE)
-         return OpenLongParams(price,sl,tp,expiration);
-     }
+      return OpenLongParams(price,sl,tp,expiration);
+
    return false;
   }
 
@@ -144,5 +255,25 @@ bool ExpressionSignals::CheckReverseShort(double &price,double &sl,double &tp,da
       return OpenShortParams(price,sl,tp,expiration);
 
    return false;
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double ExpressionSignals::GetLongPrice()
+  {
+   double base_price=(m_base_price==0.0) ? m_symbol.Ask() : m_base_price;
+   if(BuyAt == MARKET_PRICE)
+      return m_symbol.NormalizePrice(base_price-m_price_level*PriceLevelUnit());
+   return m_symbol.NormalizePrice(buyPendingParser.SolveExpression());
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+double ExpressionSignals::GetShortPrice()
+  {
+   double base_price=(m_base_price==0.0) ? m_symbol.Bid() : m_base_price;
+   if(SellAt == MARKET_PRICE)
+      return m_symbol.NormalizePrice(base_price-m_price_level*PriceLevelUnit());
+   return m_symbol.NormalizePrice(sellPendingParser.SolveExpression());
   }
 //+------------------------------------------------------------------+

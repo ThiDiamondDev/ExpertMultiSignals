@@ -55,10 +55,7 @@ protected:
    void              SolveArguments(string  &aExp[],int aFrom,int aTo,string  &aRes[]);
 
    string            SolveSimple(string  &aExp[],int aFrom,int aTo);
-   string            UserArray(int nameIndex,int callIndex)
-     {
-      return DoubleToString(caller.GetCalledIndicator(nameIndex).GetData(callIndex));
-     };
+   string            UserArray(int nameIndex,int callIndex);
 
    int               SolveFunc(string Func,string  &aRes[]);
    void              ReplaceVarsToValues(string  &aExp[],string  &aValues[],int  &aExpIndexes[],int  &aValIndexes[]);
@@ -84,6 +81,14 @@ ExpressionParser::ExpressionParser(string expression,Caller *_caller)
   {
   }
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+string ExpressionParser::UserArray(int nameIndex,int callIndex)
+  {
+   CallableIndicator *indicator = indicators.At(nameIndex);
+   return DoubleToString(indicator.GetData(callIndex));
+  };
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -169,8 +174,15 @@ bool ExpressionParser::Init()
       return false;
 
    for(int i=0; i<ArraySize(an); i++)
-      if(!caller.AddCalledIndicator(an[i]))
+     {
+      CallableIndicator *indicator;
+      if(!caller.TryGetValue(an[i],indicator))
          return false;
+      if(caller.AddCalledIndicator(an[i]) && indicators.Add(indicator))
+         continue;
+
+      return false;
+     }
 
    return true;
   }
@@ -283,9 +295,7 @@ int ExpressionParser::SolveFunc(string Func,string &aRes[])
 void ExpressionParser::ReplaceVarsToValues(string &aExp[],string &aValues[],int &aExpIndexes[],int &aValIndexes[])
   {
    for(int i=0; i<ArraySize(aExpIndexes); i++)
-     {
       aExp[aExpIndexes[i]]=aValues[aValIndexes[i]];
-     }
   }
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -341,7 +351,7 @@ double ExpressionParser::SolveExpression()
 
 // Result
    return StringToDouble(SolveSimple(r,0,cnt-1));
-   }
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -361,7 +371,7 @@ void ExpressionParser::SolveArguments(string &aExp[],int aFrom,int aTo,string &a
          aRes[ArraySize(aRes)-1]=SolveSimple(ex,strt,i-1);
          strt=i+1;
         }
-     
+
    ArrayResize(aRes,ArraySize(aRes)+1);
    aRes[ArraySize(aRes)-1]=SolveSimple(ex,strt,i-1);
 
