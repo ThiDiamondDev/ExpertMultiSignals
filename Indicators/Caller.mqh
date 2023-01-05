@@ -15,29 +15,26 @@
 class Caller: public IndicatorsMap
   {
 private:
-   CArrayString      calledIndicatorsName;
+   CArrayString      calledIndicators;
    CIndicators       indicatorsArray;
-   bool              InitIndicator(CallableIndicator * indicator);
+   bool              InitIndicator(string indicatorName);
 
 public:
-   CArrayObj         calledIndicators;
 
                      Caller(): IndicatorsMap() {};
    bool              AddCalledIndicator(string indicatorName);
    bool              InitIndicators(CIndicators *indicators);
-   CallableIndicator* GetCalledIndicator(int index)
-     {
-      return ((CallableIndicator*)calledIndicators.At(index));
-
-     };
   };
 
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-bool Caller::InitIndicator(CallableIndicator *indicator)
+bool Caller::InitIndicator(string indicatorName)
   {
-   if(indicator.InitIndicator())
+   CallableIndicator *indicator;
+   TryGetValue(indicatorName,indicator);
+
+   if(indicator && indicator.InitIndicator())
       return indicatorsArray.Add(indicator.GetIndicator());
 
    return false;
@@ -60,17 +57,12 @@ bool Caller::InitIndicators(CIndicators *indicators)
 //+------------------------------------------------------------------+
 bool Caller::AddCalledIndicator(string indicatorName)
   {
-   CallableIndicator *indicator;
-
-   if(TryGetValue(indicatorName,indicator))
+   if(ContainsKey(indicatorName))
      {
-      if(calledIndicatorsName.SearchLinear(indicatorName) == -1)
-         if(!calledIndicatorsName.Add(indicatorName))
-            return false;
-
-      return calledIndicators.Add(indicator);
+      if(calledIndicators.SearchLinear(indicatorName) == -1)
+         return calledIndicators.Add(indicatorName);
+      return true;
      }
-
    return false;
   }
 //+------------------------------------------------------------------+
