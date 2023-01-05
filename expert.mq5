@@ -59,14 +59,6 @@ int OnInit()
      }
 //---
    ExtExpert.InitSignal(signal);
-
-   int k = 1;
-   if(Digits() % 2 == 1)
-      k = 10;
-
-   signal.PriceLevel(PriceLevel / k);
-   signal.StopLevel(StopLevel / k);
-   signal.TakeLevel(TakeLevel / k);
    signal.Expiration(Expiration);
 
 //--- Creation of trailing object
