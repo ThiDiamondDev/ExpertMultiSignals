@@ -60,8 +60,14 @@ class IndicatorsMap: public CHashMap<string, CallableIndicator *>
   {
 private:
    CustomIndicator   customIndicator;
+
    string            keys[];
 public:
+                    ~IndicatorsMap()
+     {
+      for(int i=0; i< ArraySize(m_entries); i++)
+        {delete m_entries[i].value;}
+     }
                      IndicatorsMap();
    void              AddTrendIndicators();
    void              AddVolumeIndicators();
@@ -92,7 +98,7 @@ bool IndicatorsMap::Add(string key,CallableIndicator *value)
   {
    if(CHashMap<string, CallableIndicator*>::Add(key, value))
      {
-     int newSize = ArraySize(keys);
+      int newSize = ArraySize(keys);
       ArrayResize(keys,ArraySize(keys) + 1);
       keys[newSize] = key;
       return true;

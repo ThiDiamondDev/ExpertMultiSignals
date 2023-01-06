@@ -14,6 +14,12 @@
 
 #include "Indicators/Caller.mqh"
 
+struct Variable
+  {
+   string            key;
+   double            value;
+  };
+
 //+------------------------------------------------------------------+
 //| Adapted from https://www.mql5.com/en/code/303                    |
 //+------------------------------------------------------------------+
@@ -22,18 +28,10 @@ class ExpressionParserBase
 protected:
    string            UserVariables;
    string            UserArrays;
-   void              UsersVariables()
-     {
-      UserVariables="a;b;c;d"; // list of variables used
-      UserArrays="e;f";        // list of arrays used
-     }
-   string            UserFunc(string FuncName)
-     {
-      Alert("The function for "+FuncName+" variable is not defined");
-      return("0");
-     }
    //===
   };
+
+double varValues[] = {1,2,3,4};
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -44,6 +42,7 @@ protected:
    int               uri[], uvi[],   ai[],   uari[],  uavi[];
    Caller            *caller;
    CArrayObj         indicators;
+   double            variableValues[];
 
    void              Prepare();
    void              AddArrays(string  &aAr1[],string  &aAr2[]);
@@ -66,10 +65,15 @@ protected:
    void              AddIfNotExist(string aVal,string  &aAr[]);
    void              AddToArrayS(string aVal,string  &aAr[]);
    void              AddToArrayI(int aVal,int  &aAr[]);
+   void              SetVariableNames();
+   string            UserFunc(int index);
+
 public:
                      ExpressionParser(string aExpression, Caller *_caller);
    bool              Init();
+   bool              Init(Variable &vars[]);
    double            SolveExpression();
+   void              SetVariables(Variable &vars[]);
   };
 
 
@@ -80,7 +84,28 @@ ExpressionParser::ExpressionParser(string expression,Caller *_caller)
    : aExpression(expression),caller(_caller)
   {
   }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+bool ExpressionParser::Init(Variable &variables[])
+  {
+   SetVariables(variables);
+   return Init();
+  }
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+void ExpressionParser::SetVariables(Variable &variables[])
+  {
+   ArrayResize(un, ArraySize(variables));
+   ArrayResize(variableValues, ArraySize(variables));
 
+   for(int index=0; index<ArraySize(variables); index++)
+     {
+      un[index] = variables[index].key;
+      variableValues[index] = variables[index].value;
+     }
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -129,6 +154,7 @@ void ExpressionParser::Prepare()
 // 11. prepare array
    ArrayResize(t,ArraySize(r));
   }
+
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -152,15 +178,13 @@ bool ExpressionParser::Init()
    ArrayResize(un,0);
    ArrayResize(uan,0);
    ArrayResize(t,0);
-   UserVariables="";
+
+   UserVariables="a;b;c;d";
    UserArrays="";
    e="";
-
    e=aExpression;
-   UsersVariables();
-   StringSplit(UserVariables,';',un);
-
    caller.CopyKeys(uan);
+   StringSplit(UserVariables, ';',un);
 
    string as="abs;arccos;arcsin;arctan;ceil;cos;exp;floor;log;log10;max;min;mod;pow;rand;round;sin;sqrt;tan";
    string bs="/;%;*;+;-;>;<;>=;<=;==;!=;&&;||";
@@ -187,6 +211,15 @@ bool ExpressionParser::Init()
    return true;
   }
 
+//+------------------------------------------------------------------+
+//|                                                                  |
+//+------------------------------------------------------------------+
+string ExpressionParser::UserFunc(int index)
+  {
+   if(index >= 0 && index < ArraySize(varValues))
+      return DoubleToString(varValues[index]);
+   return "0";
+  }
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -790,7 +823,7 @@ void ExpressionParser::CreateElementsList(string &aExp[],string &aUserArrays[],s
 void ExpressionParser::FillUserVariables(string &aNames[],string &aValues[])
   {
    for(int i=0; i<ArraySize(aNames); i++)
-      aValues[i]=UserFunc(aNames[i]);
+      aValues[i]=UserFunc(i);
   }
 //+------------------------------------------------------------------+
 //|                                                                  |

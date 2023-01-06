@@ -21,7 +21,13 @@ private:
 
 public:
 
-                     Caller(): IndicatorsMap() {};
+                     Caller(): IndicatorsMap() {
+                     
+                     };
+                    ~Caller() {
+                    
+                     };
+
    bool              AddCalledIndicator(string indicatorName);
    bool              InitIndicators(CIndicators *indicators);
   };

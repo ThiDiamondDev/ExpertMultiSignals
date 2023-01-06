@@ -25,7 +25,6 @@ private:
    CiAMA              ama;
 
 public:
-                    ~AMA(void) {};
    virtual bool              InitIndicator();
    virtual double            GetData(int index);
    virtual void*             GetIndicator() { return GetPointer(ama);};
